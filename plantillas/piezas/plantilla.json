@@ -1,0 +1,13 @@
+{
+  "nombre": "piezas",
+  "tipo": "imagenes",
+  "descripcion": "Anuncios fijos diseñados aparte del video: pregunta, beneficio, número, lista y antes/después.",
+  "formatos": {
+    "horizontal": { "ancho": 1920, "alto": 1080 },
+    "vertical": { "ancho": 1080, "alto": 1920 },
+    "4x5": { "ancho": 1080, "alto": 1350 }
+  },
+  "piezas": ["pregunta", "beneficio", "numero", "lista", "antes-despues"],
+  "archivos": ["logo", "logoClaro", "insignia", "pantalla1", "pantalla2", "pantalla3"],
+  "pesosFuente": ["500", "600", "700"]
+}

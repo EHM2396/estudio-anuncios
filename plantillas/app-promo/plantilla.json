@@ -1,0 +1,51 @@
+{
+  "nombre": "app-promo",
+  "descripcion": "Promo de app: gancho, 3 beneficios con el teléfono y cierre con botón. 14 s.",
+  "duracion": 14,
+  "formatos": {
+    "horizontal": {
+      "ancho": 1920,
+      "alto": 1080
+    },
+    "vertical": {
+      "ancho": 1080,
+      "alto": 1920
+    }
+  },
+  "archivos": [
+    "logo",
+    "logoClaro",
+    "insignia",
+    "pantalla1",
+    "pantalla2",
+    "pantalla3"
+  ],
+  "pesosFuente": [
+    "500",
+    "600",
+    "700"
+  ],
+  "voz": {
+    "gancho": {
+      "inicio": 0.3,
+      "max": 2.5
+    },
+    "beneficio1": {
+      "inicio": 2.8,
+      "max": 2.35
+    },
+    "beneficio2": {
+      "inicio": 5.15,
+      "max": 2.25
+    },
+    "beneficio3": {
+      "inicio": 7.4,
+      "max": 2.5
+    },
+    "cierre": {
+      "inicio": 9.9,
+      "max": 4.1
+    }
+  },
+  "volumenMusica": 0.18
+}

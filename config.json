@@ -1,0 +1,10 @@
+{
+  "carpetaDatos": "~/Documents/Anuncios",
+  "hyperframes": "0.8.172",
+  "voz": {
+    "vozId": "",
+    "nombre": "",
+    "modelo": "eleven_multilingual_v2",
+    "idioma": "es"
+  }
+}

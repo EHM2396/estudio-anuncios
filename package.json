@@ -1,0 +1,14 @@
+{
+  "name": "anuncio",
+  "version": "1.0.0",
+  "description": "Claude Code skill to create ads (images and short videos for social media) for any project, with HyperFrames and ElevenLabs.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "verificar": "node anunciar.mjs verificar"
+  }
+}

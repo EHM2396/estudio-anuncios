@@ -1,0 +1,15 @@
+# Datos de cada persona: viven en la carpeta de datos (por defecto ~/Documents/Anuncios),
+# pero se ignoran por si alguien la configura dentro del repo.
+marcas/
+salidas/
+voces/
+
+# Configuración de cada equipo (voz por defecto, carpeta de datos…)
+config.local.json
+
+# Generados por Hyperframes / Node / sistema
+node_modules/
+.hyperframes/
+*.tmp.mp4
+.DS_Store
+Thumbs.db

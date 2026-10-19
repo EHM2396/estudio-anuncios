@@ -1,0 +1,926 @@
+<!doctype html>
+<html
+  lang="es"
+  data-composition-variables='[
+    {"id": "nombre", "type": "string", "label": "Nombre de la marca", "default": "Tu marca"},
+    {"id": "kicker", "type": "string", "label": "Etiqueta superior", "default": "Para tu público"},
+    {"id": "hookLinea1", "type": "string", "label": "Gancho, línea 1", "default": "¿Una pregunta"},
+    {"id": "hookLinea2", "type": "string", "label": "Gancho, línea 2 (resaltada)", "default": "que enganche?"},
+    {"id": "titulo1", "type": "string", "label": "Beneficio 1", "default": "Primer beneficio de tu producto"},
+    {"id": "titulo2", "type": "string", "label": "Beneficio 2", "default": "Segundo beneficio, claro y corto"},
+    {"id": "titulo3", "type": "string", "label": "Beneficio 3", "default": "Tercer beneficio en pocas palabras"},
+    {"id": "chip1Etiqueta", "type": "string", "label": "Tarjeta 1, etiqueta", "default": "Dato destacado"},
+    {"id": "chip1Valor", "type": "string", "label": "Tarjeta 1, valor", "default": "$100.000"},
+    {"id": "chip2Etiqueta", "type": "string", "label": "Tarjeta 2, etiqueta", "default": "Otro dato"},
+    {"id": "chip2Valor", "type": "string", "label": "Tarjeta 2, valor", "default": "24/7"},
+    {"id": "chip3Etiqueta", "type": "string", "label": "Tarjeta 3, etiqueta", "default": "Un logro"},
+    {"id": "chip3Valor", "type": "string", "label": "Tarjeta 3, valor", "default": "3 pasos"},
+    {"id": "eslogan", "type": "string", "label": "Eslogan", "default": "Tu eslogan aquí."},
+    {"id": "cta", "type": "string", "label": "Botón", "default": "Pruébalo gratis"},
+    {"id": "url", "type": "string", "label": "Web", "default": "tumarca.com"},
+    {"id": "logo", "type": "string", "label": "Logo (fondo oscuro)", "default": "assets/marca/logo.svg"},
+    {"id": "logoClaro", "type": "string", "label": "Logo (fondo claro)", "default": "assets/marca/logo.svg"},
+    {"id": "insignia", "type": "string", "label": "Insignia de tienda", "default": "assets/marca/insignia.png"},
+    {"id": "webLinea1", "type": "string", "label": "Insignia web, línea pequeña (vacío = sin insignia web)", "default": "Úsala en tu"},
+    {"id": "webLinea2", "type": "string", "label": "Insignia web, línea grande", "default": "Navegador"},
+    {"id": "pantalla1", "type": "string", "label": "Pantalla 1", "default": "assets/marca/pantalla1.png"},
+    {"id": "pantalla2", "type": "string", "label": "Pantalla 2", "default": "assets/marca/pantalla2.png"},
+    {"id": "pantalla3", "type": "string", "label": "Pantalla 3", "default": "assets/marca/pantalla3.png"},
+    {"id": "colorFondo", "type": "color", "label": "Fondo", "default": "#1E3A5F"},
+    {"id": "colorFondo2", "type": "color", "label": "Fondo profundo", "default": "#0B1B2E"},
+    {"id": "colorAcento", "type": "color", "label": "Acento", "default": "#4F8EF7"},
+    {"id": "colorTexto", "type": "color", "label": "Texto", "default": "#FFFFFF"},
+    {"id": "colorSobreAcento", "type": "color", "label": "Texto sobre acento", "default": "#0B1B2E"},
+    {"id": "colorClaro", "type": "color", "label": "Fondo claro", "default": "#EAF1FD"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-500.ttf") format("truetype");
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-600.ttf") format("truetype");
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-700.ttf") format("truetype");
+        font-weight: 700;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #062723;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Marca", sans-serif;
+        color: var(--colorTexto, #fff);
+        background: radial-gradient(
+          120% 120% at 70% 30%,
+          var(--colorFondo, #0f4d45) 0%,
+          var(--colorFondo2, #062723) 70%
+        );
+      }
+      .capa {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* ---------- Fondo ---------- */
+      .brillo {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          color-mix(in srgb, var(--colorAcento, #57b89a) 45%, transparent) 0%,
+          transparent 65%
+        );
+      }
+      #brilloA {
+        width: 1100px;
+        height: 1100px;
+        left: 900px;
+        top: -380px;
+      }
+      #brilloB {
+        width: 900px;
+        height: 900px;
+        left: -360px;
+        top: 520px;
+        opacity: 0.55;
+      }
+      #marcaGigante {
+        position: absolute;
+        left: 760px;
+        top: 640px;
+        font-size: 520px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        white-space: nowrap;
+        color: var(--colorTexto, #fff);
+        opacity: 0.045;
+      }
+      #reticula {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+        background-size: 96px 96px;
+        -webkit-mask-image: radial-gradient(80% 80% at 60% 40%, #000 0%, transparent 75%);
+        mask-image: radial-gradient(80% 80% at 60% 40%, #000 0%, transparent 75%);
+      }
+
+      /* ---------- Gancho ---------- */
+      #gancho {
+        position: absolute;
+        left: 140px;
+        top: 0;
+        bottom: 0;
+        width: 1640px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .ganchoLinea {
+        display: block;
+        font-size: 136px;
+        font-weight: 700;
+        line-height: 1.04;
+        letter-spacing: -0.04em;
+        text-wrap: balance;
+      }
+      #ganchoL2 {
+        color: var(--colorAcento, #57b89a);
+      }
+      .w {
+        display: inline-block;
+        overflow: hidden;
+        vertical-align: top;
+        padding-bottom: 0.1em;
+        margin-bottom: -0.1em;
+      }
+      .wi {
+        display: inline-block;
+      }
+      #ganchoRaya {
+        display: block;
+        width: 260px;
+        height: 10px;
+        margin-top: 36px;
+        border-radius: 5px;
+        background: var(--colorAcento, #57b89a);
+        transform-origin: left center;
+      }
+
+      /* ---------- Escena principal ---------- */
+      #barraMarca {
+        position: absolute;
+        left: 140px;
+        top: 72px;
+        height: 48px;
+      }
+      #barraMarca img {
+        height: 48px;
+        display: block;
+      }
+      #progreso {
+        position: absolute;
+        right: 140px;
+        top: 92px;
+        display: flex;
+        gap: 12px;
+      }
+      .barra {
+        width: 96px;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.18);
+        overflow: hidden;
+      }
+      .barra i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: var(--colorAcento, #57b89a);
+        transform-origin: left center;
+        transform: scaleX(0);
+      }
+      #copia {
+        position: absolute;
+        left: 140px;
+        top: 300px;
+        width: 860px;
+      }
+      #kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 24px;
+        border-radius: 999px;
+        border: 1.5px solid color-mix(in srgb, var(--colorAcento, #57b89a) 55%, transparent);
+        background: color-mix(in srgb, var(--colorAcento, #57b89a) 14%, transparent);
+        color: var(--colorAcento, #57b89a);
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      #kicker b {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--colorAcento, #57b89a);
+      }
+      #titulos {
+        position: relative;
+        height: 330px;
+        margin-top: 44px;
+      }
+      .titulo {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 860px;
+        font-size: 92px;
+        font-weight: 700;
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        opacity: 0;
+      }
+      #indice {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-top: 18px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      #indiceRaya {
+        width: 120px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.35);
+        transform-origin: left center;
+      }
+      #indiceNum {
+        position: relative;
+        width: 40px;
+        height: 32px;
+        overflow: hidden;
+      }
+      .num {
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: var(--colorTexto, #fff);
+      }
+
+      /* ---------- Teléfono ---------- */
+      #telPos {
+        position: absolute;
+        left: 1150px;
+        top: 130px;
+        width: 470px;
+        height: 830px;
+      }
+      #telHalo {
+        position: absolute;
+        left: -260px;
+        top: 120px;
+        width: 990px;
+        height: 700px;
+        border-radius: 50%;
+        background: radial-gradient(
+          closest-side,
+          color-mix(in srgb, var(--colorAcento, #57b89a) 40%, transparent),
+          transparent
+        );
+      }
+      #telGiro {
+        position: absolute;
+        inset: 0;
+      }
+      #tel {
+        position: absolute;
+        inset: 0;
+        padding: 16px;
+        border-radius: 68px;
+        background: linear-gradient(160deg, #26302e, #0b1110 55%, #1b2321);
+        box-shadow:
+          0 0 0 2px rgba(255, 255, 255, 0.08) inset,
+          0 60px 120px rgba(0, 0, 0, 0.55),
+          0 20px 40px rgba(0, 0, 0, 0.35);
+      }
+      #pantalla {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 52px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .pant {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+      #isla {
+        position: absolute;
+        left: 50%;
+        top: 30px;
+        width: 120px;
+        height: 34px;
+        margin-left: -60px;
+        border-radius: 17px;
+        background: #0b1110;
+      }
+
+      /* ---------- Tarjetas flotantes ---------- */
+      .tarjeta {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 22px 32px 22px 22px;
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.97);
+        color: var(--colorFondo2, #062723);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+        white-space: nowrap;
+        opacity: 0;
+      }
+      .tarjeta .ico {
+        width: 60px;
+        height: 60px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        background: var(--colorAcento, #57b89a);
+        flex: none;
+      }
+      .tarjeta .ico svg {
+        width: 32px;
+        height: 32px;
+      }
+      .tarjeta small {
+        display: block;
+        font-size: 22px;
+        font-weight: 500;
+        color: #5b6b68;
+      }
+      .tarjeta strong {
+        display: block;
+        font-size: 42px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        color: var(--colorFondo, #0f4d45);
+      }
+      #tarjeta1 {
+        left: 980px;
+        top: 660px;
+      }
+      #tarjeta2 {
+        left: 1500px;
+        top: 230px;
+      }
+      #tarjeta3 {
+        left: 990px;
+        top: 330px;
+      }
+
+      /* ---------- Cierre ---------- */
+      #cierre {
+        position: absolute;
+        left: 140px;
+        top: 250px;
+        width: 960px;
+      }
+      #cierreLogo {
+        height: 104px;
+        display: block;
+      }
+      #cierreEslogan {
+        margin-top: 54px;
+        font-size: 96px;
+        font-weight: 700;
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        opacity: 0;
+      }
+      #cierreRaya {
+        width: 180px;
+        height: 8px;
+        margin-top: 40px;
+        border-radius: 4px;
+        background: var(--colorAcento, #57b89a);
+        transform-origin: left center;
+        transform: scaleX(0);
+      }
+      #cierreAccion {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 30px;
+        margin-top: 52px;
+      }
+      #boton {
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        padding: 28px 46px;
+        border-radius: 999px;
+        background: var(--colorAcento, #57b89a);
+        color: var(--colorSobreAcento, #06302a);
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        box-shadow: 0 24px 50px color-mix(in srgb, var(--colorAcento, #57b89a) 40%, transparent);
+        opacity: 0;
+      }
+      #boton svg {
+        width: 34px;
+        height: 34px;
+      }
+      #brillo {
+        position: absolute;
+        top: -20px;
+        left: 0;
+        width: 120px;
+        height: 160px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.65),
+          transparent
+        );
+      }
+      #tienda {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        opacity: 0;
+      }
+      #canales {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      #canales img {
+        height: 72px;
+        display: block;
+      }
+      /* insignia web, con el mismo aspecto que la de la tienda */
+      #insigniaWeb {
+        height: 72px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 26px 0 18px;
+        border-radius: 11px;
+        background: #000;
+        border: 1.5px solid #a6a6a6;
+        color: #fff;
+      }
+      #insigniaWeb svg {
+        width: 40px;
+        height: 40px;
+        flex: none;
+      }
+      #insigniaWeb small {
+        display: block;
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        line-height: 1.1;
+      }
+      #insigniaWeb b {
+        display: block;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        line-height: 1.05;
+      }
+      #tienda > span {
+        font-size: 26px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.75);
+        letter-spacing: 0.02em;
+      }
+      /* ---------- Formato vertical (1080×1920, Reels / TikTok / Shorts / Stories) ----------
+         Arriba (~250px) y abajo (~380px) los tapa la interfaz de la red: ahí no va nada clave. */
+      #root[data-formato="vertical"] #brilloA { left: 200px; top: -300px; }
+      #root[data-formato="vertical"] #brilloB { left: -420px; top: 1200px; }
+      #root[data-formato="vertical"] #marcaGigante { left: 60px; top: 1560px; font-size: 380px; }
+      #root[data-formato="vertical"] #gancho { left: 80px; width: 920px; }
+      #root[data-formato="vertical"] .ganchoLinea { font-size: 124px; }
+      #root[data-formato="vertical"] #barraMarca { left: 80px; top: 150px; }
+      #root[data-formato="vertical"] #progreso { right: 80px; top: 170px; }
+      #root[data-formato="vertical"] #copia { left: 80px; top: 270px; width: 920px; }
+      #root[data-formato="vertical"] #titulos { height: 250px; margin-top: 34px; }
+      #root[data-formato="vertical"] .titulo { width: 920px; font-size: 76px; }
+      #root[data-formato="vertical"] #telPos { left: 305px; top: 760px; }
+      #root[data-formato="vertical"] #telHalo { left: -300px; top: 60px; }
+      #root[data-formato="vertical"] #tarjeta1 { left: 56px; top: 1330px; }
+      #root[data-formato="vertical"] #tarjeta2 { left: 600px; top: 900px; }
+      #root[data-formato="vertical"] #tarjeta3 { left: 56px; top: 1010px; }
+      #root[data-formato="vertical"] #cierre { left: 80px; top: 280px; width: 920px; }
+      #root[data-formato="vertical"] #cierreLogo { height: 88px; }
+      #root[data-formato="vertical"] #cierreEslogan { margin-top: 44px; font-size: 92px; }
+      #root[data-formato="vertical"] #cierreAccion { margin-top: 48px; }
+
+      /* ================= Estilos visuales (data-estilo en #root) ================= */
+      /* fondos claros (claro, color, minimal): textos y detalles oscuros */
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) {
+        color: var(--colorFondo2);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) .barra {
+        background: rgba(6, 39, 35, 0.14);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) #indice {
+        color: rgba(6, 39, 35, 0.55);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) #indiceRaya {
+        background: rgba(6, 39, 35, 0.3);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) .num,
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) #marcaGigante {
+        color: var(--colorFondo2);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) #boton {
+        background: var(--colorFondo2);
+        color: #fff;
+        box-shadow: 0 24px 50px rgba(6, 39, 35, 0.25);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) #tienda > span {
+        color: rgba(6, 39, 35, 0.72);
+      }
+      #root:is([data-estilo="claro"], [data-estilo="color"], [data-estilo="minimal"]) .tarjeta {
+        box-shadow: 0 24px 50px rgba(6, 39, 35, 0.18);
+      }
+
+      /* --- claro --- */
+      #root[data-estilo="claro"] {
+        background: radial-gradient(120% 120% at 70% 30%, #fff 0%, var(--colorClaro) 70%);
+      }
+      #root[data-estilo="claro"] #reticula {
+        background-image:
+          linear-gradient(rgba(6, 39, 35, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(6, 39, 35, 0.05) 1px, transparent 1px);
+      }
+      #root[data-estilo="claro"] #ganchoL2,
+      #root[data-estilo="claro"] #kicker {
+        color: color-mix(in srgb, var(--colorAcento) 55%, var(--colorFondo2));
+      }
+
+      /* --- color --- */
+      #root[data-estilo="color"] {
+        background: radial-gradient(120% 120% at 70% 30%, color-mix(in srgb, var(--colorAcento) 78%, #fff) 0%, var(--colorAcento) 70%);
+      }
+      #root[data-estilo="color"] #reticula {
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      }
+      #root[data-estilo="color"] .brillo,
+      #root[data-estilo="color"] #telHalo {
+        background: radial-gradient(closest-side, rgba(255, 255, 255, 0.4), transparent);
+      }
+      #root[data-estilo="color"] #marcaGigante {
+        color: #fff;
+        opacity: 0.14;
+      }
+      #root[data-estilo="color"] #ganchoL2 {
+        color: #fff;
+      }
+      #root[data-estilo="color"] #ganchoRaya,
+      #root[data-estilo="color"] #cierreRaya,
+      #root[data-estilo="color"] .barra i,
+      #root[data-estilo="color"] #kicker b {
+        background: var(--colorFondo2);
+      }
+      #root[data-estilo="color"] #kicker {
+        color: var(--colorFondo2);
+        border-color: rgba(6, 39, 35, 0.3);
+        background: rgba(255, 255, 255, 0.35);
+      }
+      #root[data-estilo="color"] #logoBarra {
+        height: 72px;
+        padding: 12px 20px;
+        border-radius: 14px;
+        background: #fff;
+      }
+      #root[data-estilo="color"] #barraMarca {
+        top: 60px;
+      }
+      #root[data-estilo="color"] #cierreLogo {
+        height: 136px;
+        padding: 16px 30px;
+        border-radius: 22px;
+        background: #fff;
+      }
+
+      /* --- minimal --- */
+      #root[data-estilo="minimal"] {
+        background: #fafaf7;
+      }
+      #root[data-estilo="minimal"] #reticula,
+      #root[data-estilo="minimal"] .brillo,
+      #root[data-estilo="minimal"] #marcaGigante,
+      #root[data-estilo="minimal"] #telHalo {
+        display: none;
+      }
+      #root[data-estilo="minimal"] #ganchoL2,
+      #root[data-estilo="minimal"] #kicker {
+        color: var(--colorFondo);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-formato="horizontal"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="14"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Fondo vivo durante todo el anuncio -->
+      <section id="fondo" class="clip capa" data-start="0" data-duration="14" data-track-index="0">
+        <div id="reticula"></div>
+        <div id="brilloA" class="brillo"></div>
+        <div id="brilloB" class="brillo"></div>
+        <div id="marcaGigante"></div>
+      </section>
+
+      <!-- 1. Gancho -->
+      <section id="escenaGancho" class="clip capa" data-start="0" data-duration="2.6" data-track-index="1">
+        <div id="gancho">
+          <span id="ganchoL1" class="ganchoLinea"></span>
+          <span id="ganchoL2" class="ganchoLinea"></span>
+          <span id="ganchoRaya"></span>
+        </div>
+      </section>
+
+      <!-- 2. Beneficios + 3. Cierre -->
+      <section id="escenaPrincipal" class="clip capa" data-start="2.3" data-duration="11.7" data-track-index="2">
+        <div id="barraMarca"><img id="logoBarra" data-var-src="logo" src="assets/marca/logo.svg" alt="" /></div>
+        <div id="progreso">
+          <div class="barra"><i id="fill1"></i></div>
+          <div class="barra"><i id="fill2"></i></div>
+          <div class="barra"><i id="fill3"></i></div>
+        </div>
+
+        <div id="copia">
+          <div id="kicker"><b></b><span id="kickerTxt"></span></div>
+          <div id="titulos">
+            <h2 id="titulo1" class="titulo"></h2>
+            <h2 id="titulo2" class="titulo"></h2>
+            <h2 id="titulo3" class="titulo"></h2>
+          </div>
+          <div id="indice">
+            <div id="indiceNum">
+              <span id="num1" class="num">01</span>
+              <span id="num2" class="num">02</span>
+              <span id="num3" class="num">03</span>
+            </div>
+            <div id="indiceRaya"></div>
+            <span>03</span>
+          </div>
+        </div>
+
+        <div id="telPos">
+          <div id="telHalo"></div>
+          <div id="telGiro">
+            <div id="tel">
+              <div id="pantalla">
+                <img id="pant1" class="pant" data-var-src="pantalla1" src="assets/marca/pantalla1.png" alt="" />
+                <img id="pant2" class="pant" data-var-src="pantalla2" src="assets/marca/pantalla2.png" alt="" />
+                <img id="pant3" class="pant" data-var-src="pantalla3" src="assets/marca/pantalla3.png" alt="" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tarjeta1" class="tarjeta">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></svg></div>
+          <div><small id="chip1Etiqueta"></small><strong id="chip1Valor"></strong></div>
+        </div>
+        <div id="tarjeta2" class="tarjeta">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></div>
+          <div><small id="chip2Etiqueta"></small><strong id="chip2Valor"></strong></div>
+        </div>
+        <div id="tarjeta3" class="tarjeta">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3" /><path d="M8 3v4M16 3v4M3.5 10h17" /></svg></div>
+          <div><small id="chip3Etiqueta"></small><strong id="chip3Valor"></strong></div>
+        </div>
+
+        <div id="cierre">
+          <img id="cierreLogo" data-var-src="logo" src="assets/marca/logo.svg" alt="" />
+          <h2 id="cierreEslogan"></h2>
+          <div id="cierreRaya"></div>
+          <div id="cierreAccion">
+            <div id="boton">
+              <span id="ctaTxt"></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              <div id="brillo"></div>
+            </div>
+            <div id="tienda">
+              <div id="canales">
+                <img id="insignia" data-var-src="insignia" src="assets/marca/insignia.png" alt="" />
+                <div id="insigniaWeb">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5" /><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5c-2.6-2.8-3.9-6-3.9-9.5s1.3-6.7 3.9-9.5z" /></svg>
+                  <div><small id="webLinea1"></small><b id="webLinea2"></b></div>
+                </div>
+              </div>
+              <span id="urlTxt"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIO: anunciar.mjs inserta aquí la voz y la música de la marca -->
+    </div>
+
+    <script>
+      // ---------- Variables de marca ----------
+      function leerVariables() {
+        const decl = JSON.parse(document.documentElement.dataset.compositionVariables || "[]");
+        const base = Object.fromEntries(decl.map((d) => [d.id, d.default]));
+        const hf = window.__hyperframes;
+        return Object.assign(base, hf && hf.getVariables ? hf.getVariables() : {});
+      }
+      const v = leerVariables();
+      const $ = (id) => document.getElementById(id);
+      const vertical = $("root").dataset.formato === "vertical";
+
+      // Parte un texto en palabras con máscara para revelarlas una a una
+      function enPalabras(el, texto) {
+        el.textContent = "";
+        texto.split(/\s+/).filter(Boolean).forEach((p, i) => {
+          if (i) el.appendChild(document.createTextNode(" "));
+          const w = document.createElement("span");
+          w.className = "w";
+          const wi = document.createElement("span");
+          wi.className = "wi";
+          wi.textContent = p;
+          w.appendChild(wi);
+          el.appendChild(w);
+        });
+      }
+
+      enPalabras($("ganchoL1"), v.hookLinea1);
+      enPalabras($("ganchoL2"), v.hookLinea2);
+      $("marcaGigante").textContent = v.nombre;
+      $("kickerTxt").textContent = v.kicker;
+      [1, 2, 3].forEach((n) => {
+        $("titulo" + n).textContent = v["titulo" + n];
+        $("chip" + n + "Etiqueta").textContent = v["chip" + n + "Etiqueta"];
+        $("chip" + n + "Valor").textContent = v["chip" + n + "Valor"];
+      });
+      enPalabras($("cierreEslogan"), v.eslogan);
+      $("ctaTxt").textContent = v.cta;
+      $("urlTxt").textContent = v.url;
+      if (!v.insignia) $("insignia").remove();
+      // estilos con fondo claro: logo para fondo claro
+      if (($("root").dataset.estilo || "oscuro") !== "oscuro" && v.logoClaro) {
+        for (const id of ["logoBarra", "cierreLogo"]) {
+          $(id).removeAttribute("data-var-src");
+          $(id).src = v.logoClaro;
+        }
+      }
+      if (v.webLinea1 || v.webLinea2) {
+        $("webLinea1").textContent = v.webLinea1;
+        $("webLinea2").textContent = v.webLinea2;
+      } else $("insigniaWeb").remove();
+
+      // Si el valor de una tarjeta lleva un número, se anima contando
+      function contador(el, texto) {
+        const m = texto.match(/^(\D*)([\d.,]+)(.*)$/);
+        if (!m) return null;
+        const sep = m[2].includes(".") ? "." : m[2].includes(",") ? "," : "";
+        const fin = parseInt(m[2].replace(/[.,]/g, ""), 10);
+        const fmt = (n) => (sep ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep) : String(n));
+        const o = { n: 0 };
+        return { o, fin, pintar: () => (el.textContent = m[1] + fmt(Math.round(o.n)) + m[3]) };
+      }
+
+      // ---------- Línea de tiempo ----------
+      const tl = gsap.timeline({ paused: true });
+      const B = [2.6, 5.0, 7.4]; // inicio de cada beneficio
+      const CIERRE = 9.8;
+      const FIN = 14;
+
+      // Fondo: deriva lenta y continua
+      tl.fromTo("#brilloA", { x: 0, y: 0 }, { x: -260, y: 120, duration: FIN, ease: "sine.inOut" }, 0);
+      tl.fromTo("#brilloB", { x: 0, y: 0 }, { x: 220, y: -90, duration: FIN, ease: "sine.inOut" }, 0);
+      tl.fromTo("#marcaGigante", { x: 120 }, { x: -220, duration: FIN, ease: "none" }, 0);
+
+      // 1. Gancho: palabras que suben desde una máscara
+      tl.fromTo(
+        "#ganchoL1 .wi, #ganchoL2 .wi",
+        { yPercent: 115 },
+        { yPercent: 0, duration: 0.75, ease: "expo.out", stagger: 0.07 },
+        0.2,
+      );
+      tl.fromTo("#ganchoRaya", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, 1.0);
+      tl.to("#ganchoL1 .wi, #ganchoL2 .wi", { yPercent: -115, duration: 0.35, ease: "power3.in", stagger: 0.025 }, 2.05);
+      tl.to("#ganchoRaya", { scaleX: 0, transformOrigin: "right center", duration: 0.3, ease: "power2.in" }, 2.1);
+
+      // 2. Entrada de la escena principal
+      tl.fromTo("#barraMarca", { opacity: 0, x: -24 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }, 2.6);
+      tl.fromTo("#progreso", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "sine.out" }, 2.7);
+      tl.fromTo("#kicker", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, 2.55);
+      tl.fromTo("#indiceRaya", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.inOut" }, 2.9);
+      tl.fromTo("#indice", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "sine.out" }, 2.9);
+      tl.fromTo(
+        "#telPos",
+        { y: 760, rotation: 6, opacity: 1 },
+        { y: 0, rotation: 0, duration: 1.15, ease: "expo.out" },
+        2.4,
+      );
+      tl.fromTo("#telHalo", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 1.4, ease: "sine.out" }, 2.6);
+      gsap.set("#telGiro", { transformPerspective: 1800 });
+      tl.fromTo(
+        "#telGiro",
+        { rotationY: -18, rotationX: 6 },
+        { rotationY: -7, rotationX: 2, duration: CIERRE - 0.2 - 2.4, ease: "sine.inOut" },
+        2.4,
+      );
+      gsap.set(["#pant2", "#pant3"], { yPercent: 100 });
+
+      // Beneficios: título + pantalla + tarjeta + barra de progreso
+      B.forEach((t, i) => {
+        const n = i + 1;
+        const dur = (B[i + 1] || CIERRE) - t;
+
+        tl.fromTo(
+          "#titulo" + n,
+          { opacity: 0, y: 60, clipPath: "inset(0% 0% 100% 0%)" },
+          { opacity: 1, y: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 0.75, ease: "expo.out" },
+          t + 0.05,
+        );
+        tl.fromTo("#fill" + n, { scaleX: 0 }, { scaleX: 1, duration: dur, ease: "none" }, t);
+        tl.fromTo("#num" + n, { yPercent: 100 }, { yPercent: 0, duration: 0.5, ease: "power3.out" }, t);
+
+        if (n > 1) {
+          // cambio de pantalla: la nueva sube y la anterior se va con paralaje
+          tl.fromTo("#pant" + n, { yPercent: 100 }, { yPercent: 0, duration: 0.8, ease: "power4.inOut" }, t - 0.15);
+          tl.to("#pant" + (n - 1), { yPercent: -28, duration: 0.8, ease: "power4.inOut" }, t - 0.15);
+          tl.to("#num" + (n - 1), { yPercent: -100, duration: 0.4, ease: "power2.in" }, t - 0.05);
+        }
+
+        // la tarjeta salta del teléfono y flota
+        const tar = "#tarjeta" + n;
+        tl.fromTo(tar, { opacity: 0, scale: 0.6, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.8)" }, t + 0.45);
+        tl.to(tar, { y: -14, duration: dur - 1.0, ease: "sine.inOut" }, t + 1.05);
+        const c = contador($("chip" + n + "Valor"), v["chip" + n + "Valor"]);
+        if (c) {
+          c.pintar();
+          tl.to(c.o, { n: c.fin, duration: 1.1, ease: "power2.out", onUpdate: c.pintar }, t + 0.5);
+        }
+
+        // salida (más rápida que la entrada)
+        const salida = (B[i + 1] || CIERRE) - 0.3;
+        tl.to("#titulo" + n, { opacity: 0, y: -40, duration: 0.3, ease: "power2.in" }, salida);
+        tl.to(tar, { opacity: 0, scale: 0.9, duration: 0.25, ease: "power2.in" }, salida);
+      });
+
+      // 3. Cierre: logo, eslogan, botón y tienda
+      tl.to(["#kicker", "#indice", "#progreso", "#barraMarca"], { opacity: 0, duration: 0.3, ease: "power2.in" }, CIERRE - 0.3);
+      const telCierre = vertical ? { x: 0, y: 230, scale: 0.84 } : { x: 90, y: 40, scale: 0.92 };
+      tl.to("#telPos", { ...telCierre, duration: 1.0, ease: "power3.inOut" }, CIERRE - 0.2);
+      tl.to("#telGiro", { rotationY: -16, rotationX: 4, duration: 1.0, ease: "power3.inOut" }, CIERRE - 0.2);
+      tl.fromTo(
+        "#cierreLogo",
+        { clipPath: "inset(0% 100% 0% 0%)", x: -30 },
+        { clipPath: "inset(0% 0% 0% 0%)", x: 0, duration: 0.9, ease: "expo.out" },
+        CIERRE + 0.1,
+      );
+      gsap.set("#cierreEslogan", { opacity: 1 });
+      tl.fromTo(
+        "#cierreEslogan .wi",
+        { opacity: 0, x: 46 },
+        { opacity: 1, x: 0, duration: 0.9, ease: "power3.out", stagger: 0.08 },
+        CIERRE + 0.4,
+      );
+      tl.fromTo("#cierreRaya", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.out" }, CIERRE + 0.9);
+      tl.fromTo("#boton", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(2)" }, CIERRE + 1.1);
+      tl.fromTo("#tienda", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }, CIERRE + 1.35);
+      tl.fromTo("#brillo", { x: -160, skewX: -20 }, { x: 640, skewX: -20, duration: 0.9, ease: "power2.inOut" }, CIERRE + 1.9);
+      tl.fromTo("#brillo", { x: -160 }, { x: 640, duration: 0.9, ease: "power2.inOut", immediateRender: false }, CIERRE + 3.2);
+      tl.to("#boton", { scale: 1.05, duration: 0.35, ease: "sine.inOut", yoyo: true, repeat: 1 }, CIERRE + 2.6);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

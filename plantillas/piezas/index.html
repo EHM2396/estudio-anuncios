@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-500.ttf") format("truetype");
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-600.ttf") format("truetype");
+        font-weight: 600;
+      }
+      @font-face {
+        font-family: "Marca";
+        src: url("assets/marca/fuente-700.ttf") format("truetype");
+        font-weight: 700;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #062723;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Marca", sans-serif;
+        --pad-y: 110px;
+        --pad-x: 120px;
+        --pad-abajo: 110px;
+      }
+      #root[data-formato="vertical"] {
+        /* arriba y abajo los tapa la interfaz de Stories / Reels */
+        --pad-y: 230px;
+        --pad-x: 80px;
+        --pad-abajo: 330px;
+      }
+      #root[data-formato="4x5"] {
+        --pad-y: 90px;
+        --pad-x: 80px;
+        --pad-abajo: 90px;
+      }
+
+      /* ---------- Base de cada pieza ---------- */
+      .pieza {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        padding: var(--pad-y) var(--pad-x) var(--pad-abajo);
+        display: flex;
+        flex-direction: column;
+      }
+      .oscura {
+        color: #fff;
+        background: radial-gradient(130% 110% at 80% 10%, var(--colorFondo) 0%, var(--colorFondo2) 70%);
+      }
+      .clara {
+        color: var(--colorFondo2);
+        background: radial-gradient(120% 100% at 85% 15%, #fff 0%, var(--colorClaro) 60%);
+      }
+      .logo {
+        height: 56px;
+        display: block;
+        align-self: flex-start;
+        position: relative;
+      }
+      .contenido {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .kicker {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--colorFondo);
+        background: color-mix(in srgb, var(--colorAcento) 22%, transparent);
+      }
+      .kicker::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--colorAcento);
+      }
+      .titulo {
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.03;
+        text-wrap: balance;
+      }
+      .sub {
+        font-weight: 500;
+        line-height: 1.3;
+        text-wrap: pretty;
+      }
+      .oscura .sub {
+        color: rgba(255, 255, 255, 0.78);
+      }
+      .clara .sub {
+        color: color-mix(in srgb, var(--colorFondo2) 72%, transparent);
+      }
+
+      /* ---------- Pie: botón + insignias + web ---------- */
+      .pie {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .pie-fila {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 22px;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        height: 84px;
+        padding: 0 42px;
+        border-radius: 999px;
+        font-size: 34px;
+        font-weight: 700;
+        background: var(--colorAcento);
+        color: var(--colorSobreAcento);
+      }
+      .clara .cta {
+        background: var(--colorFondo);
+        color: #fff;
+      }
+      .cta svg {
+        width: 30px;
+        height: 30px;
+      }
+      .insignia {
+        height: 68px;
+        display: block;
+      }
+      .insignia-web {
+        height: 68px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 24px 0 16px;
+        border-radius: 11px;
+        background: #000;
+        border: 1.5px solid #a6a6a6;
+        color: #fff;
+      }
+      .insignia-web svg {
+        width: 38px;
+        height: 38px;
+        flex: none;
+      }
+      .insignia-web small {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        line-height: 1.1;
+      }
+      .insignia-web b {
+        display: block;
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1.05;
+      }
+      .url {
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .oscura .url {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .clara .url {
+        color: color-mix(in srgb, var(--colorFondo2) 65%, transparent);
+      }
+
+      /* ---------- Teléfono y tarjetas ---------- */
+      .tel {
+        position: absolute;
+        padding: 14px;
+        border-radius: 62px;
+        background: linear-gradient(160deg, #2a3432, #0b1110 55%, #1d2523);
+        box-shadow:
+          0 0 0 2px rgba(255, 255, 255, 0.08) inset,
+          0 50px 100px rgba(0, 0, 0, 0.35),
+          0 16px 32px rgba(0, 0, 0, 0.2);
+      }
+      .tel .pantalla {
+        width: 100%;
+        height: 100%;
+        border-radius: 48px;
+        overflow: hidden;
+        background: #fff;
+      }
+      .tel img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+      }
+      .tarjeta {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 30px 20px 20px;
+        border-radius: 24px;
+        background: #fff;
+        color: var(--colorFondo2);
+        box-shadow: 0 26px 50px rgba(6, 39, 35, 0.22);
+        white-space: nowrap;
+      }
+      .tarjeta .ico {
+        width: 58px;
+        height: 58px;
+        border-radius: 17px;
+        display: grid;
+        place-items: center;
+        background: var(--colorAcento);
+        flex: none;
+      }
+      .tarjeta .ico svg {
+        width: 30px;
+        height: 30px;
+      }
+      .tarjeta small {
+        display: block;
+        font-size: 21px;
+        font-weight: 500;
+        color: #5b6b68;
+      }
+      .tarjeta strong {
+        display: block;
+        font-size: 40px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        color: var(--colorFondo);
+      }
+
+      /* ---------- 1. Pregunta ---------- */
+      #p-pregunta .aro {
+        position: absolute;
+        right: -260px;
+        bottom: -360px;
+        width: 1000px;
+        height: 1000px;
+        border-radius: 50%;
+        border: 120px solid color-mix(in srgb, var(--colorAcento) 16%, transparent);
+      }
+      #p-pregunta .punto {
+        position: absolute;
+        right: 110px;
+        top: 100px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--colorAcento);
+        opacity: 0.9;
+      }
+      #p-pregunta .contenido {
+        flex: 1;
+        justify-content: center;
+      }
+      #p-pregunta .titulo {
+        font-size: 150px;
+        max-width: 1500px;
+      }
+      #p-pregunta .resaltado {
+        color: var(--colorAcento);
+      }
+      #p-pregunta .sub {
+        font-size: 40px;
+        max-width: 1100px;
+        margin-top: 44px;
+      }
+      [data-formato="vertical"] #p-pregunta .titulo {
+        font-size: 132px;
+      }
+      [data-formato="vertical"] #p-pregunta .sub {
+        font-size: 40px;
+      }
+      [data-formato="vertical"] #p-pregunta .punto {
+        right: 90px;
+        top: 120px;
+        width: 90px;
+        height: 90px;
+      }
+      [data-formato="4x5"] #p-pregunta .titulo {
+        font-size: 116px;
+      }
+      [data-formato="4x5"] #p-pregunta .sub {
+        font-size: 34px;
+        margin-top: 32px;
+      }
+      [data-formato="4x5"] #p-pregunta .punto {
+        right: 80px;
+        top: 80px;
+        width: 70px;
+        height: 70px;
+      }
+
+      /* ---------- 2. Beneficio (fondo claro) ---------- */
+      #p-beneficio .mancha {
+        position: absolute;
+        right: -200px;
+        top: 80px;
+        width: 1000px;
+        height: 1000px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, color-mix(in srgb, var(--colorAcento) 45%, transparent), transparent);
+      }
+      #p-beneficio .contenido {
+        flex: 1;
+        justify-content: center;
+        width: 860px;
+        gap: 34px;
+      }
+      #p-beneficio .titulo {
+        font-size: 96px;
+      }
+      #p-beneficio .sub {
+        font-size: 36px;
+        max-width: 760px;
+      }
+      #p-beneficio .tel {
+        right: 230px;
+        top: 110px;
+        width: 500px;
+        height: 890px;
+        transform: rotate(5deg);
+      }
+      #p-beneficio .tarjeta {
+        right: 560px;
+        top: 690px;
+      }
+      [data-formato="vertical"] #p-beneficio .contenido,
+      [data-formato="4x5"] #p-beneficio .contenido {
+        flex: none;
+        width: auto;
+        margin-top: 50px;
+        gap: 26px;
+      }
+      [data-formato="vertical"] #p-beneficio .pie,
+      [data-formato="4x5"] #p-beneficio .pie {
+        margin-top: 40px;
+      }
+      [data-formato="vertical"] #p-beneficio .titulo {
+        font-size: 88px;
+      }
+      [data-formato="vertical"] #p-beneficio .tel {
+        right: auto;
+        left: 270px;
+        top: 1080px;
+        width: 540px;
+        height: 960px;
+      }
+      [data-formato="vertical"] #p-beneficio .tarjeta {
+        right: auto;
+        left: 60px;
+        top: 1400px;
+      }
+      [data-formato="4x5"] #p-beneficio .titulo {
+        font-size: 70px;
+      }
+      [data-formato="4x5"] #p-beneficio .sub {
+        font-size: 30px;
+      }
+      [data-formato="4x5"] #p-beneficio .tel {
+        left: auto;
+        right: 60px;
+        top: 760px;
+        width: 420px;
+        height: 750px;
+      }
+      [data-formato="4x5"] #p-beneficio .tarjeta {
+        right: 380px;
+        top: 1010px;
+      }
+
+      /* ---------- 3. Número ---------- */
+      #p-numero .contenido {
+        flex: 1;
+        justify-content: center;
+      }
+      #p-numero .etiqueta {
+        font-size: 34px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--colorAcento);
+      }
+      #p-numero .valor {
+        font-size: 230px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        margin: 18px 0 30px -8px;
+      }
+      #p-numero .sub {
+        font-size: 42px;
+        max-width: 900px;
+      }
+      #p-numero .tel {
+        right: 130px;
+        top: 150px;
+        width: 470px;
+        height: 836px;
+        transform: rotate(-6deg);
+      }
+      #p-numero .halo {
+        position: absolute;
+        right: 0;
+        top: 100px;
+        width: 900px;
+        height: 900px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, color-mix(in srgb, var(--colorAcento) 35%, transparent), transparent);
+      }
+      [data-formato="vertical"] #p-numero .contenido,
+      [data-formato="4x5"] #p-numero .contenido {
+        flex: none;
+        margin-top: 70px;
+      }
+      [data-formato="vertical"] #p-numero .pie,
+      [data-formato="4x5"] #p-numero .pie {
+        margin-top: 44px;
+      }
+      [data-formato="vertical"] #p-numero .valor {
+        font-size: 200px;
+      }
+      [data-formato="vertical"] #p-numero .sub {
+        font-size: 40px;
+      }
+      [data-formato="vertical"] #p-numero .tel {
+        right: 110px;
+        top: 1160px;
+        width: 500px;
+        height: 890px;
+      }
+      [data-formato="vertical"] #p-numero .halo {
+        right: -200px;
+        top: 1000px;
+      }
+      [data-formato="4x5"] #p-numero .contenido {
+        margin-top: 40px;
+      }
+      [data-formato="4x5"] #p-numero .etiqueta {
+        font-size: 28px;
+      }
+      [data-formato="4x5"] #p-numero .valor {
+        font-size: 180px;
+        margin-bottom: 22px;
+      }
+      [data-formato="4x5"] #p-numero .sub {
+        font-size: 32px;
+        max-width: 560px;
+      }
+      [data-formato="4x5"] #p-numero .tel {
+        right: 50px;
+        top: 700px;
+        width: 380px;
+        height: 676px;
+      }
+      [data-formato="4x5"] #p-numero .halo {
+        right: -300px;
+        top: 600px;
+      }
+
+      /* ---------- 4. Lista ---------- */
+      #p-lista .contenido {
+        flex: 1;
+        justify-content: center;
+        width: 900px;
+        gap: 40px;
+      }
+      #p-lista .titulo {
+        font-size: 88px;
+      }
+      #p-lista ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      #p-lista li {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 22px 30px 22px 22px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.96);
+        color: var(--colorFondo2);
+        font-size: 36px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        align-self: flex-start;
+      }
+      #p-lista li i {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--colorAcento);
+        flex: none;
+      }
+      #p-lista li svg {
+        width: 28px;
+        height: 28px;
+      }
+      #p-lista .tel {
+        right: 220px;
+        top: 120px;
+        width: 480px;
+        height: 854px;
+        transform: rotate(4deg);
+      }
+      #p-lista .halo {
+        position: absolute;
+        right: -60px;
+        top: 60px;
+        width: 900px;
+        height: 900px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, color-mix(in srgb, var(--colorAcento) 30%, transparent), transparent);
+      }
+      [data-formato="vertical"] #p-lista .contenido,
+      [data-formato="4x5"] #p-lista .contenido {
+        flex: none;
+        width: auto;
+        margin-top: 60px;
+        gap: 32px;
+      }
+      [data-formato="vertical"] #p-lista .pie,
+      [data-formato="4x5"] #p-lista .pie {
+        margin-top: 40px;
+      }
+      [data-formato="vertical"] #p-lista .titulo {
+        font-size: 84px;
+      }
+      [data-formato="vertical"] #p-lista .tel {
+        right: 90px;
+        top: 1290px;
+        width: 460px;
+        height: 818px;
+      }
+      [data-formato="vertical"] #p-lista .halo {
+        top: 1150px;
+      }
+      [data-formato="4x5"] #p-lista .titulo {
+        font-size: 66px;
+      }
+      [data-formato="4x5"] #p-lista li {
+        font-size: 30px;
+        padding: 16px 26px 16px 16px;
+      }
+      [data-formato="4x5"] #p-lista li i {
+        width: 46px;
+        height: 46px;
+      }
+      [data-formato="4x5"] #p-lista ul {
+        gap: 14px;
+      }
+      [data-formato="4x5"] #p-lista .tel {
+        right: -30px;
+        top: 790px;
+        width: 330px;
+        height: 587px;
+      }
+      [data-formato="4x5"] #p-lista .halo {
+        right: -340px;
+        top: 450px;
+      }
+
+      /* ---------- 5. Antes / después ---------- */
+      #p-antes {
+        padding: 0;
+        flex-direction: row;
+      }
+      #p-antes .lado {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: var(--pad-y) var(--pad-x) var(--pad-abajo);
+      }
+      #p-antes .antes {
+        background: #eef1f0;
+        color: #3f4a48;
+      }
+      #p-antes .despues {
+        color: #fff;
+        background: radial-gradient(130% 110% at 80% 10%, var(--colorFondo) 0%, var(--colorFondo2) 75%);
+      }
+      #p-antes .etiqueta {
+        align-self: flex-start;
+        padding: 12px 26px;
+        border-radius: 999px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      #p-antes .antes .etiqueta {
+        background: #dfe4e2;
+        color: #6b7774;
+      }
+      #p-antes .despues .etiqueta {
+        background: var(--colorAcento);
+        color: var(--colorSobreAcento);
+      }
+      #p-antes ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+        margin-top: 150px;
+      }
+      #p-antes li {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        font-size: 46px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+      #p-antes .antes li {
+        color: #7c8785;
+        text-decoration: line-through;
+        text-decoration-thickness: 3px;
+        text-decoration-color: rgba(124, 135, 133, 0.6);
+      }
+      #p-antes li i {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      #p-antes .antes li i {
+        background: #dfe4e2;
+      }
+      #p-antes .despues li i {
+        background: var(--colorAcento);
+      }
+      #p-antes li svg {
+        width: 30px;
+        height: 30px;
+      }
+      #p-antes .flecha {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 120px;
+        height: 120px;
+        margin: -60px 0 0 -60px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--colorAcento);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        z-index: 2;
+      }
+      #p-antes .flecha svg {
+        width: 56px;
+        height: 56px;
+      }
+      #p-antes .despues .pie {
+        margin-top: auto;
+      }
+      #p-antes .despues .logo {
+        margin-bottom: 0;
+      }
+      #p-antes .cabecera {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      [data-formato="vertical"] #p-antes,
+      [data-formato="4x5"] #p-antes {
+        flex-direction: column;
+      }
+      [data-formato="vertical"] #p-antes .antes {
+        flex: 0 0 45%;
+        padding-bottom: 80px;
+      }
+      [data-formato="vertical"] #p-antes .despues {
+        padding-top: 90px;
+      }
+      [data-formato="vertical"] #p-antes .flecha,
+      [data-formato="4x5"] #p-antes .flecha {
+        top: 45%;
+        transform: rotate(90deg);
+      }
+      [data-formato="vertical"] #p-antes ul {
+        margin-top: 70px;
+        gap: 28px;
+      }
+      [data-formato="vertical"] #p-antes li {
+        font-size: 44px;
+      }
+      [data-formato="4x5"] #p-antes .antes {
+        flex: 0 0 42%;
+        padding-bottom: 50px;
+      }
+      [data-formato="4x5"] #p-antes .flecha {
+        top: 42%;
+        width: 96px;
+        height: 96px;
+        margin: -48px 0 0 -48px;
+      }
+      [data-formato="4x5"] #p-antes .despues {
+        padding-top: 60px;
+      }
+      [data-formato="4x5"] #p-antes ul {
+        margin-top: 40px;
+        gap: 18px;
+      }
+      [data-formato="4x5"] #p-antes li {
+        font-size: 34px;
+      }
+      [data-formato="4x5"] #p-antes li i {
+        width: 48px;
+        height: 48px;
+      }
+      [data-formato="4x5"] #p-antes .etiqueta {
+        font-size: 22px;
+        padding: 10px 20px;
+      }
+
+      /* ---------- Ajustes comunes de formatos compactos ---------- */
+      [data-formato="vertical"] .logo,
+      [data-formato="4x5"] .logo {
+        height: 50px;
+      }
+      [data-formato="4x5"] .cta {
+        height: 72px;
+        padding: 0 34px;
+        font-size: 28px;
+      }
+      [data-formato="4x5"] .insignia,
+      [data-formato="4x5"] .insignia-web {
+        height: 60px;
+      }
+      [data-formato="4x5"] .insignia-web b {
+        font-size: 24px;
+      }
+      [data-formato="4x5"] .url {
+        font-size: 22px;
+      }
+      [data-formato="4x5"] .pie {
+        gap: 12px;
+      }
+      [data-formato="4x5"] .pie-fila {
+        gap: 16px;
+      }
+      [data-formato="4x5"] .tarjeta strong {
+        font-size: 32px;
+      }
+      [data-formato="4x5"] .tarjeta small {
+        font-size: 18px;
+      }
+      [data-formato="4x5"] .tarjeta .ico {
+        width: 48px;
+        height: 48px;
+      }
+
+      /* ================= Estilos visuales (data-estilo en #root) ================= */
+
+      /* --- claro: todo sobre fondo blanco --- */
+      [data-estilo="claro"] #p-lista li {
+        box-shadow: 0 10px 30px rgba(6, 39, 35, 0.1);
+      }
+      [data-estilo="claro"] #p-antes .despues {
+        background: #fff;
+        color: var(--colorFondo2);
+      }
+
+      /* --- color: fondo del color de acento --- */
+      [data-estilo="color"] .pieza,
+      [data-estilo="color"] #p-antes .despues {
+        background: radial-gradient(120% 110% at 80% 10%, color-mix(in srgb, var(--colorAcento) 80%, #fff) 0%, var(--colorAcento) 65%);
+        color: var(--colorFondo2);
+      }
+      [data-estilo="color"] #p-antes {
+        background: none;
+      }
+      [data-estilo="color"] #p-antes .antes {
+        background: #eef1f0;
+      }
+      [data-estilo="color"] .sub,
+      [data-estilo="color"] .url {
+        color: color-mix(in srgb, var(--colorFondo2) 80%, transparent);
+      }
+      [data-estilo="color"] .cta {
+        background: var(--colorFondo2);
+        color: #fff;
+      }
+      [data-estilo="color"] .logo {
+        height: 80px;
+        padding: 12px 22px;
+        border-radius: 16px;
+        background: #fff;
+      }
+      [data-estilo="color"] #p-pregunta .resaltado {
+        color: #fff;
+      }
+      [data-estilo="color"] #p-pregunta .aro {
+        border-color: rgba(255, 255, 255, 0.28);
+      }
+      [data-estilo="color"] #p-pregunta .punto {
+        background: var(--colorFondo2);
+      }
+      [data-estilo="color"] .halo,
+      [data-estilo="color"] #p-beneficio .mancha {
+        background: radial-gradient(closest-side, rgba(255, 255, 255, 0.45), transparent);
+      }
+      [data-estilo="color"] #p-numero .etiqueta {
+        color: var(--colorFondo2);
+      }
+      [data-estilo="color"] .kicker {
+        background: rgba(255, 255, 255, 0.4);
+        color: var(--colorFondo2);
+      }
+      [data-estilo="color"] .kicker::before,
+      [data-estilo="color"] #p-antes .despues li i,
+      [data-estilo="color"] #p-antes .despues .etiqueta {
+        background: var(--colorFondo2);
+        color: #fff;
+      }
+      [data-estilo="color"] #p-antes .flecha {
+        background: var(--colorFondo2);
+      }
+      [data-estilo="color"] #p-antes .flecha svg {
+        stroke: #fff;
+      }
+
+      /* --- minimal: casi solo tipografía, sin teléfono ni adornos --- */
+      [data-estilo="minimal"] .pieza,
+      [data-estilo="minimal"] #p-antes .despues {
+        background: #fafaf7;
+        color: var(--colorFondo2);
+      }
+      [data-estilo="minimal"] #p-antes {
+        background: none;
+      }
+      [data-estilo="minimal"] #p-antes .antes {
+        background: #f0f0ec;
+      }
+      [data-estilo="minimal"] .tel,
+      [data-estilo="minimal"] .tarjeta,
+      [data-estilo="minimal"] .aro,
+      [data-estilo="minimal"] .punto,
+      [data-estilo="minimal"] .halo,
+      [data-estilo="minimal"] .mancha {
+        display: none;
+      }
+      [data-estilo="minimal"] .sub,
+      [data-estilo="minimal"] .url {
+        color: color-mix(in srgb, var(--colorFondo2) 70%, transparent);
+      }
+      [data-estilo="minimal"] .cta {
+        background: var(--colorFondo2);
+        color: #fff;
+      }
+      [data-estilo="minimal"] #p-pregunta .resaltado {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-color: var(--colorAcento);
+        text-decoration-thickness: 0.09em;
+        text-underline-offset: 0.12em;
+      }
+      [data-estilo="minimal"] #p-beneficio .contenido,
+      [data-estilo="minimal"] #p-lista .contenido {
+        width: auto;
+        max-width: 1400px;
+      }
+      [data-estilo="minimal"] #p-numero .valor {
+        color: var(--colorFondo);
+      }
+      [data-estilo="minimal"] #p-numero .etiqueta {
+        color: var(--colorFondo);
+      }
+      [data-estilo="minimal"] #p-lista li {
+        background: none;
+        padding: 6px 0;
+        font-size: 44px;
+      }
+      [data-formato="4x5"][data-estilo="minimal"] #p-lista li {
+        font-size: 34px;
+      }
+      /* sin teléfono, el texto se centra en el alto disponible */
+      #root[data-estilo="minimal"] .pieza .contenido {
+        flex: 1;
+        justify-content: center;
+        margin-top: 0;
+      }
+      #root[data-estilo="minimal"] .pieza .pie {
+        margin-top: 0;
+      }
+      #root[data-estilo="minimal"] #p-numero .valor {
+        font-size: 300px;
+      }
+      /* minimal vive de la tipografía: títulos más grandes */
+      #root[data-estilo="minimal"] #p-beneficio .titulo,
+      #root[data-estilo="minimal"] #p-lista .titulo {
+        font-size: 120px;
+      }
+      #root[data-estilo="minimal"][data-formato="vertical"] #p-beneficio .titulo,
+      #root[data-estilo="minimal"][data-formato="vertical"] #p-lista .titulo {
+        font-size: 104px;
+      }
+      #root[data-estilo="minimal"][data-formato="4x5"] #p-beneficio .titulo,
+      #root[data-estilo="minimal"][data-formato="4x5"] #p-lista .titulo {
+        font-size: 92px;
+      }
+      #root[data-estilo="minimal"][data-formato="4x5"] .sub {
+        font-size: 36px;
+      }
+      #root[data-estilo="minimal"][data-formato="4x5"] #p-numero .valor,
+      #root[data-estilo="minimal"][data-formato="vertical"] #p-numero .valor {
+        font-size: 210px;
+      }
+      [data-estilo="minimal"] #p-antes .despues .etiqueta {
+        background: var(--colorFondo2);
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cada pieza ocupa 1 s de la línea de tiempo; el script saca una imagen de cada una -->
+    <div
+      id="root"
+      data-formato="horizontal"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="5"
+      data-width="1920"
+      data-height="1080"
+    >
+      <section id="p-pregunta" class="clip pieza oscura" data-start="0" data-duration="1" data-track-index="0">
+        <div class="aro"></div>
+        <div class="punto"></div>
+        <img class="logo" src="{{img:logo}}" alt="" />
+        <div class="contenido">
+          <h1 class="titulo" id="preguntaTitulo"></h1>
+          <p class="sub" id="preguntaSub"></p>
+        </div>
+        <div class="pie" data-pie></div>
+      </section>
+
+      <section id="p-beneficio" class="clip pieza clara" data-start="1" data-duration="1" data-track-index="0">
+        <div class="mancha"></div>
+        <div class="tel"><div class="pantalla"><img src="{{img:@beneficio}}" alt="" /></div></div>
+        <div class="tarjeta" id="beneficioTarjeta"></div>
+        <img class="logo" src="{{img:logoClaro}}" alt="" />
+        <div class="contenido">
+          <span class="kicker" id="beneficioKicker"></span>
+          <h1 class="titulo" id="beneficioTitulo"></h1>
+          <p class="sub" id="beneficioSub"></p>
+        </div>
+        <div class="pie" data-pie></div>
+      </section>
+
+      <section id="p-numero" class="clip pieza oscura" data-start="2" data-duration="1" data-track-index="0">
+        <div class="halo"></div>
+        <div class="tel"><div class="pantalla"><img src="{{img:@numero}}" alt="" /></div></div>
+        <img class="logo" src="{{img:logo}}" alt="" />
+        <div class="contenido">
+          <span class="etiqueta" id="numeroEtiqueta"></span>
+          <span class="valor" id="numeroValor"></span>
+          <p class="sub" id="numeroSub"></p>
+        </div>
+        <div class="pie" data-pie></div>
+      </section>
+
+      <section id="p-lista" class="clip pieza oscura" data-start="3" data-duration="1" data-track-index="0">
+        <div class="halo"></div>
+        <div class="tel"><div class="pantalla"><img src="{{img:@lista}}" alt="" /></div></div>
+        <img class="logo" src="{{img:logo}}" alt="" />
+        <div class="contenido">
+          <h1 class="titulo" id="listaTitulo"></h1>
+          <ul id="listaItems"></ul>
+        </div>
+        <div class="pie" data-pie></div>
+      </section>
+
+      <section id="p-antes" class="clip pieza" data-start="4" data-duration="1" data-track-index="0">
+        <div class="lado antes">
+          <span class="etiqueta" id="antesTitulo"></span>
+          <ul id="antesItems"></ul>
+        </div>
+        <div class="flecha"><svg viewBox="0 0 24 24" fill="none" stroke="#06302a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></div>
+        <div class="lado despues">
+          <div class="cabecera">
+            <span class="etiqueta" id="despuesTitulo"></span>
+            <img class="logo" src="{{img:logo}}" alt="" />
+          </div>
+          <ul id="despuesItems"></ul>
+          <div class="pie" data-pie></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // El script anunciar.mjs reemplaza este objeto con los datos de la marca
+      const D = "__DATOS__";
+      const $ = (id) => document.getElementById(id);
+      const root = $("root");
+      for (const [k, val] of Object.entries(D.colores)) root.style.setProperty("--" + k, val);
+
+      // Estilo: en claro / color / minimal todas las piezas van con fondo claro y logo para fondo claro
+      if (D.estilo !== "oscuro") {
+        document.querySelectorAll(".oscura").forEach((el) => el.classList.replace("oscura", "clara"));
+        document.querySelectorAll("img.logo").forEach((img) => (img.src = D.archivos.logoClaro));
+      }
+
+      const ICONOS = {
+        check: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+        x: '<svg viewBox="0 0 24 24" fill="none" stroke="#8a9592" stroke-width="2.8" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"/></svg>',
+        flecha: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+        globo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5c-2.6-2.8-3.9-6-3.9-9.5s1.3-6.7 3.9-9.5z"/></svg>',
+        sube: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>',
+      };
+      const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+      const T = D.textos;
+      const I = D.imagenes;
+
+      // Pie común: botón, insignias y web
+      const web = T.webLinea1 || T.webLinea2
+        ? `<div class="insignia-web">${ICONOS.globo}<div><small>${esc(T.webLinea1)}</small><b>${esc(T.webLinea2)}</b></div></div>`
+        : "";
+      document.querySelectorAll("[data-pie]").forEach((el) => {
+        el.innerHTML = `<div class="pie-fila"><span class="cta">${esc(T.cta)} ${ICONOS.flecha}</span>
+          ${D.archivos.insignia ? `<img class="insignia" src="${D.archivos.insignia}" alt="" />` : ""}${web}</div>
+          <span class="url">${esc(T.url)}</span>`;
+      });
+
+      // 1. Pregunta (la parte resaltada va en color de acento)
+      const p = I.pregunta;
+      const i0 = p.resaltado ? p.titulo.lastIndexOf(p.resaltado) : -1;
+      $("preguntaTitulo").innerHTML = i0 >= 0
+        ? esc(p.titulo.slice(0, i0)) + `<span class="resaltado">${esc(p.resaltado)}</span>` + esc(p.titulo.slice(i0 + p.resaltado.length))
+        : esc(p.titulo);
+      $("preguntaSub").textContent = p.subtitulo;
+
+      // 2. Beneficio
+      const b = I.beneficio;
+      $("beneficioKicker").textContent = b.kicker;
+      $("beneficioTitulo").textContent = b.titulo;
+      $("beneficioSub").textContent = b.subtitulo;
+      $("beneficioTarjeta").innerHTML = `<div class="ico">${ICONOS.check}</div><div><small>${esc(b.tarjeta.etiqueta)}</small><strong>${esc(b.tarjeta.valor)}</strong></div>`;
+
+      // 3. Número
+      const n = I.numero;
+      $("numeroEtiqueta").textContent = n.etiqueta;
+      $("numeroValor").textContent = n.valor;
+      $("numeroSub").textContent = n.subtitulo;
+
+      // 4. Lista
+      const l = I.lista;
+      $("listaTitulo").textContent = l.titulo;
+      $("listaItems").innerHTML = l.items.map((t) => `<li><i>${ICONOS.check}</i>${esc(t)}</li>`).join("");
+
+      // 5. Antes / después
+      const a = I["antes-despues"];
+      $("antesTitulo").textContent = a.antesTitulo;
+      $("despuesTitulo").textContent = a.despuesTitulo;
+      $("antesItems").innerHTML = a.antes.map((t) => `<li><i>${ICONOS.x}</i><span>${esc(t)}</span></li>`).join("");
+      $("despuesItems").innerHTML = a.despues.map((t) => `<li><i>${ICONOS.check}</i>${esc(t)}</li>`).join("");
+
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
