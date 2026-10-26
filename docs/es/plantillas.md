@@ -94,7 +94,7 @@ Igual que la de video, salvo que recibe los datos como las de imágenes:
   - `foco`: el de `video.foco`.
   - `proporcion`: ancho/alto de las capturas, para dibujar el teléfono a su medida.
   - `variante`: el número de la versión, o `--variante`.
-- Con `variante` como semilla de un generador determinista (nunca `Math.random`), la plantilla elige la toma de cada beneficio (`telefono`, `pantalla`, `cifra`, `tipo`), el orden de las capturas, el lado del teléfono, los giros, el gancho, la transición al cierre y el tipo de cierre. Así cada versión sale distinta y la misma variante siempre da el mismo video.
+- Con `variante` como semilla de un generador determinista (nunca `Math.random`), la plantilla elige la toma de cada beneficio (`telefono`, `pantalla`, `cifra`, `tipo`), el lado del teléfono, los giros, el gancho, la transición al cierre y el tipo de cierre. Cada captura va siempre con su beneficio. Así cada versión sale distinta y la misma variante siempre da el mismo video.
 - `{{img:<clave>}}` se reemplaza por la ruta del archivo de la marca.
 - El script **no** pone `data-estilo`; la plantilla pone `data-direccion` en `#root` y cada dirección cambia variables de CSS y su perfil de movimiento en el JS.
 - `plantilla.json` lleva además:

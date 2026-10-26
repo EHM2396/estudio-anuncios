@@ -133,7 +133,7 @@ El video usa la plantilla `promo` (14 s, por escenas) y se mueve según la direc
 - **Cierre:** logo con golpe, eslogan, y el botón que se presiona.
 - **Transiciones y efectos de sonido** propios de cada dirección: póster con zoom y destello y golpes de bajo; datos con barras y clics; nocturno con haz de luz; editorial con cambio de página; cercano con iris y pops.
 
-**Cada video sale distinto.** La plantilla usa una **variante** (por defecto, el número de la versión) para elegir la toma de cada beneficio (el teléfono con la cámara, la captura en grande recorrida, la cifra gigante contando o solo tipografía), el orden de las capturas, el lado del teléfono, los giros de cámara, el tipo de gancho (si la marca no lo fija), la transición al cierre y si el cierre va centrado o con el teléfono. Siempre sale el teléfono al menos una vez y al menos una toma distinta. `versiones` muestra la variante de cada video.
+**Cada video sale distinto.** La plantilla usa una **variante** (por defecto, el número de la versión) para elegir la toma de cada beneficio (el teléfono con la cámara, la captura en grande recorrida, la cifra gigante contando o solo tipografía), el lado del teléfono, los giros de cámara, el tipo de gancho (si la marca no lo fija), la transición al cierre y si el cierre va centrado o con el teléfono. Siempre sale el teléfono al menos una vez y al menos una toma distinta. Cada captura va siempre con su beneficio. `versiones` muestra la variante de cada video.
 - Para **ajustar** un video que le gustó (un texto, una captura) sin que cambien las tomas, genera con `--variante <la de esa versión>`.
 - Para **otro distinto**, genera sin `--variante`.
 

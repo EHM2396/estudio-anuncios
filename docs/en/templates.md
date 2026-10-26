@@ -96,7 +96,7 @@ Same as a video template, except it receives the data the way image templates do
   - `foco`: comes from `video.foco`.
   - `proporcion`: the screenshots' width/height, to draw the phone to fit them.
   - `variante`: the version number, or `--variante`.
-- Using `variante` as the seed of a deterministic generator (never `Math.random`), the template picks each benefit's shot (`telefono`, `pantalla`, `cifra`, `tipo`), the screenshot order, the phone's side, the camera turns, the hook, the transition into the closing and the closing layout. Each version comes out different, and the same variant always gives the same video.
+- Using `variante` as the seed of a deterministic generator (never `Math.random`), the template picks each benefit's shot (`telefono`, `pantalla`, `cifra`, `tipo`), the phone's side, the camera turns, the hook, the transition into the closing and the closing layout. Each screenshot always stays with its own benefit. Each version comes out different, and the same variant always gives the same video.
 - `{{img:<key>}}` becomes the path to the brand file.
 - The script does **not** set `data-estilo`; the template sets `data-direccion` on `#root`, and each direction changes CSS variables and its motion profile in the JS.
 - `plantilla.json` also includes:

@@ -23,7 +23,7 @@ Everything is interactive, through menus, and nothing gets lost: every version i
 - **Hooks that hold attention:** writes several hooks from proven formulas, scores them, and lets you generate the same ad with 2 or 3 different hooks to test which one keeps people watching. See [Hooks and retention](docs/en/hooks.md).
 - **Builds the brand by itself:** colors, logos, fonts, screenshots and copy. You don't create any folders or files.
 - **Image ads:** 5 designed pieces (question, benefit, number, list, before/after) in landscape 1920×1080, portrait 1080×1920 and 4:5 1080×1350.
-- **14-second animated video that hooks:** the hook slams in from the very first frame, the camera orbits the phone in 3D and zooms into app details, transitions have character, and the button gets pressed at the end. It moves according to the creative direction and carries synced sound effects. **Every video you generate comes out different:** each benefit's shot (phone, big screenshot, giant number or type only), the screenshot order, the camera turns, the hook and the closing all change. Landscape, portrait and 4:5.
+- **14-second animated video that hooks:** the hook slams in from the very first frame, the camera orbits the phone in 3D and zooms into app details, transitions have character, and the button gets pressed at the end. It moves according to the creative direction and carries synced sound effects. **Every video you generate comes out different:** each benefit's shot (phone, big screenshot, giant number or type only), the phone's side, the camera turns, the hook and the closing all change. Landscape, portrait and 4:5.
 - **Voice and music** with [ElevenLabs](https://elevenlabs.io), optional and added separately. Audio is mastered to the standard loudness for social media.
 - **6 creative directions** so each project gets its own design, not just another color: editorial, poster, data, night, friendly and classic. You see them side by side before choosing. See [Creative directions](docs/en/directions.md).
 - **Review and versions:** after each result you choose to approve, adjust, ask for something different, or go back to a previous version.
@@ -46,7 +46,7 @@ The skill checks Node and FFmpeg every time it starts and offers to install anyt
 
 Open Claude Code and tell it:
 
-> Install the skill from https://github.com/<user>/<repo> into my Claude Code skills, in a folder named `anuncio`.
+> Install the skill from https://github.com/EHM2396/estudio-anuncios into my Claude Code skills, in a folder named `anuncio`.
 
 Claude clones the repo into `~/.claude/skills/anuncio`. Open a new chat and type `/anuncio`.
 
@@ -56,10 +56,10 @@ Clone the repo into Claude Code's skills folder, named `anuncio`:
 
 ```bash
 # macOS / Linux
-git clone https://github.com/<user>/<repo>.git ~/.claude/skills/anuncio
+git clone https://github.com/EHM2396/estudio-anuncios.git ~/.claude/skills/anuncio
 
 # Windows (PowerShell)
-git clone https://github.com/<user>/<repo>.git "$env:USERPROFILE\.claude\skills\anuncio"
+git clone https://github.com/EHM2396/estudio-anuncios.git "$env:USERPROFILE\.claude\skills\anuncio"
 ```
 
 That's all. Open a new Claude Code chat and type `/anuncio`.

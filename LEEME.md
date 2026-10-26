@@ -21,7 +21,7 @@ Todo es interactivo, por menús, y nada se pierde: cada versión queda guardada.
 - **Ganchos que retienen:** escribe varios ganchos con fórmulas probadas, los puntúa y te deja generar el mismo anuncio con 2 o 3 ganchos distintos para probar cuál retiene más. Ver [Ganchos y retención](docs/es/ganchos.md).
 - **Crea la marca sola:** colores, logos, fuentes, capturas y textos. No tienes que crear carpetas ni archivos.
 - **Imágenes publicitarias:** 5 piezas diseñadas (pregunta, beneficio, número, lista, antes/después) en horizontal 1920×1080, vertical 1080×1920 y 4:5 1080×1350.
-- **Video animado de 14 s que engancha:** el gancho cae con golpe desde el primer fotograma, la cámara gira en 3D alrededor del teléfono y se acerca a los detalles de la app, hay transiciones con carácter y el botón se presiona al final. Se mueve según la dirección creativa y lleva efectos de sonido sincronizados. **Cada video que generas sale distinto:** cambian las tomas de cada beneficio (teléfono, captura en grande, cifra gigante o solo tipografía), el orden de las capturas, los giros de cámara, el gancho y el cierre. En horizontal, vertical y 4:5.
+- **Video animado de 14 s que engancha:** el gancho cae con golpe desde el primer fotograma, la cámara gira en 3D alrededor del teléfono y se acerca a los detalles de la app, hay transiciones con carácter y el botón se presiona al final. Se mueve según la dirección creativa y lleva efectos de sonido sincronizados. **Cada video que generas sale distinto:** cambian las tomas de cada beneficio (teléfono, captura en grande, cifra gigante o solo tipografía), el lado del teléfono, los giros de cámara, el gancho y el cierre. En horizontal, vertical y 4:5.
 - **Voz y música** con [ElevenLabs](https://elevenlabs.io), opcionales y aparte. El audio se masteriza al volumen estándar de redes.
 - **6 direcciones creativas** para que cada proyecto tenga su propio diseño y no solo otro color: editorial, póster, datos, nocturno, cercano y clásica. Las ves lado a lado antes de elegir. Ver [Direcciones creativas](docs/es/direcciones.md).
 - **Revisión y versiones:** después de cada resultado eliges aprobar, ajustar, pedir otras diferentes o volver a una versión anterior.
@@ -44,7 +44,7 @@ La skill revisa Node y FFmpeg cada vez que arranca y, si falta algo, te ofrece i
 
 Abre Claude Code y escríbele:
 
-> Instala la skill de https://github.com/<usuario>/<repo> en mis skills de Claude Code, en la carpeta `anuncio`.
+> Instala la skill de https://github.com/EHM2396/estudio-anuncios en mis skills de Claude Code, en la carpeta `anuncio`.
 
 Claude clona el repo en `~/.claude/skills/anuncio`. Abre un chat nuevo y escribe `/anuncio`.
 
@@ -54,10 +54,10 @@ Clona el repo dentro de la carpeta de skills de Claude Code, con el nombre `anun
 
 ```bash
 # macOS / Linux
-git clone https://github.com/<usuario>/<repo>.git ~/.claude/skills/anuncio
+git clone https://github.com/EHM2396/estudio-anuncios.git ~/.claude/skills/anuncio
 
 # Windows (PowerShell)
-git clone https://github.com/<usuario>/<repo>.git "$env:USERPROFILE\.claude\skills\anuncio"
+git clone https://github.com/EHM2396/estudio-anuncios.git "$env:USERPROFILE\.claude\skills\anuncio"
 ```
 
 No hay nada más que instalar. Abre un chat nuevo de Claude Code y escribe `/anuncio`.

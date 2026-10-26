@@ -151,7 +151,8 @@
       .url { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
 
       /* ---------- 1. Pregunta: el titular llena el póster ---------- */
-      #p-pregunta .titulo { font-size: 250px; }
+      /* con resaltado en otra línea, 0.92 deja que la caja tape las cifras y tildes de la línea vecina */
+      #p-pregunta .titulo { font-size: 250px; line-height: 1.1; }
       #p-pregunta .cinta.blanca { margin-top: 48px; font-size: 36px; }
       #p-pregunta .signo {
         position: absolute;
@@ -174,7 +175,7 @@
       #p-beneficio .sticker { right: 640px; top: 640px; }
 
       /* ---------- 3. Número: cifra enorme sobre tinta ---------- */
-      #p-numero .texto { width: 1100px; gap: 10px; }
+      #p-numero .texto { width: 1000px; gap: 10px; }
       #p-numero .valor { font-family: "Titular", sans-serif; font-size: 400px; line-height: 0.95; color: var(--colorAcento); white-space: nowrap; margin-top: 20px; }
       #p-numero .sub { font-size: 40px; }
       #p-numero .tel { right: 120px; top: 170px; height: 1100px; transform: rotate(8deg); }
@@ -255,8 +256,9 @@
       [data-formato="vertical"] #p-numero .tel { right: 40px; top: 1120px; height: 1100px; }
       [data-formato="vertical"] #p-lista .titulo { font-size: 150px; }
       [data-formato="vertical"] #p-lista ul { font-size: 56px; }
-      [data-formato="vertical"] #p-antes .antes { width: auto; right: 0; bottom: auto; height: 46%; padding: var(--pad-y) var(--pad-x) 60px; }
-      [data-formato="vertical"] #p-antes .despues { width: auto; left: 0; top: auto; height: 60%; padding: 180px var(--pad-x) var(--pad-abajo); clip-path: polygon(0 12%, 100% 0, 100% 100%, 0 100%); }
+      [data-formato="vertical"] #p-antes .antes { width: auto; right: 0; bottom: auto; height: 40%; padding: var(--pad-y) var(--pad-x) 40px; gap: 24px; }
+      /* el logo, el título, tres líneas y el pie no cabían en el 60 %: se tapaban y cortaban */
+      [data-formato="vertical"] #p-antes .despues { width: auto; left: 0; top: auto; height: 67%; padding: 150px var(--pad-x) var(--pad-abajo); gap: 26px; clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 100%); }
       [data-formato="vertical"] #p-antes .grande { font-size: 130px; }
       [data-formato="vertical"] #p-antes .antes .grande { font-size: 150px; }
       [data-formato="vertical"] #p-antes .antes li { font-size: 44px; }

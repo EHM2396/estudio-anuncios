@@ -18,7 +18,7 @@
 //   --direccion editorial|poster|datos|nocturno|cercano|clasica   (imágenes) dirección creativa (por defecto: la de marca.json)
 //   --estilo oscuro|claro|color|minimal   estilo visual de la dirección clásica (por defecto: el de marca.json, si no "oscuro")
 //   --gancho 1,2,3                   usa esos ganchos de marca.ganchos (una versión por gancho, para probarlos)
-//   --variante 7                     (video promo) qué tomas, orden y movimientos usa; por defecto, el número de versión
+//   --variante 7                     (video promo) qué tomas y movimientos usa; por defecto, el número de versión
 //   --sfx                            (video) efectos de sonido en el video sin voz
 //   --nota "texto"                   qué cambió en esta versión (aparece en "versiones")
 //   --borrador                       render rápido de baja calidad
@@ -386,7 +386,7 @@ function direccionVideo() {
   return d;
 }
 
-// Variante del video: la plantilla elige con ella las tomas de cada beneficio, el orden de las capturas, el lado
+// Variante del video: la plantilla elige con ella las tomas de cada beneficio, el lado
 // del teléfono, los giros y la transición al cierre. Por defecto es el número de la versión que se va a crear,
 // así cada video nuevo sale distinto; con --gancho 1,2,3 todas las versiones del lote comparten la misma.
 let varianteLote;

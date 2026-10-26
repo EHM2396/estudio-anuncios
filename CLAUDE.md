@@ -53,4 +53,6 @@ El contrato de cada tipo de plantilla (qué reemplaza el script y qué debe tene
 - No combines un `transform` de CSS con un tween de GSAP sobre la misma propiedad: GSAP lee el del CSS y lo suma al suyo (por ejemplo, un `translateY(100%)` en CSS más un tween de `yPercent` deja el elemento fuera de lugar). Fija el estado inicial con GSAP.
 - En `promo`, las variables de cada dirección van en `#root[data-direccion="…"]`: sin el `#root`, las de la base (que están en `#root`) les ganan.
 - No animes la `section.clip` de una escena: anima su hijo `.marco`.
+- En los videos, todo estado inicial va en la línea de tiempo (`tl.set(…, 0)`), nunca con un `gsap.set` suelto: el render final se hace por partes en paralelo y un `gsap.set` fuera de la línea de tiempo se puede perder (los fotogramas sueltos de `snapshot` no lo muestran; revisa también un render con `--borrador`).
+- En `promo`, todo lo que varía entre videos sale del generador con semilla (`D.variante`), nunca de `Math.random`: la misma variante tiene que dar siempre el mismo video.
 - Después de una captura, Chrome puede tardar unos segundos en soltar la carpeta del proyecto (`EPERM`); el script ya reintenta.

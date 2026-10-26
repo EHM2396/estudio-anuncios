@@ -463,7 +463,9 @@
         tomas = tomas.map((tm, i) => (i && tm !== "telefono" && tm === tomas[i - 1] ? "telefono" : tm)); // sin dos iguales seguidas
         return {
           tomas,
-          orden: barajar([1, 2, 3]), // qué captura sale en cada beneficio
+          // cada captura va con su beneficio (título y tarjeta): barajarlas sacaba, por ejemplo, el inicio en
+          // «Recuerda cada cita». Se sigue barajando y se descarta para no mover las demás elecciones de cada variante.
+          orden: (barajar([1, 2, 3]), [1, 2, 3]),
           espejo: FORMATO === "horizontal" && r() < 0.5, // teléfono a la izquierda
           signo: r() < 0.5 ? -1 : 1, // hacia dónde gira la cámara
           fuerza: 0.8 + r() * 0.4,
@@ -629,7 +631,7 @@
 
         if (TIPO === "demo") {
           // demo en frío: la cámara arranca pegada a la app y se aleja girando
-          gsap.set("#ganchoTel", { transformPerspective: PERSPECTIVA });
+          tl.set("#ganchoTel", { transformPerspective: PERSPECTIVA }, 0);
           const destino = FORMATO === "horizontal" ? { x: 430, y: 0 } : { x: 0, y: 380 };
           tl.fromTo("#ganchoTel", { scale: 2.3, rotationY: 0, rotationX: 0, x: 0, y: 260 }, { scale: 0.92, rotationY: -22 * factorGiro, rotationX: 8, ...destino, duration: 1.3, ease: "power3.inOut" }, 0);
         } else if (TIPO === "chat") {
@@ -648,7 +650,7 @@
       const aplicar = () => (mundo.style.transform = `translate3d(${cam.x}px, ${cam.y}px, ${cam.z}px) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg) rotateZ(${cam.rz}deg)`);
       // Muestra u oculta un bloque según la toma de cada beneficio (cambia justo antes de cada uno)
       function visibilidad(sel, visible) {
-        gsap.set(sel, { opacity: visible[0] ? 1 : 0 });
+        tl.set(sel, { opacity: visible[0] ? 1 : 0 }, 0);
         visible.forEach((v, i) => {
           if (i && v !== visible[i - 1]) tl.fromTo(sel, { opacity: v ? 0 : 1 }, { opacity: v ? 1 : 0, duration: 0.2, ease: "power2.inOut", immediateRender: false }, B[i] - 0.2);
         });
@@ -689,9 +691,11 @@
           if (conCopia(toma)) {
             entrar("#t" + n, t + 0.05, V.titulos[i], i);
             if (V.titulos[i] === "golpe") sacudir("#sacB", t + 0.12, P.sacudida * 0.5);
-            // sale siempre (aunque la toma siguiente oculte la columna, puede volver a mostrarse después)
-            if (!ultima) tl.to("#t" + n, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, fin - 0.2);
-          } else gsap.set("#t" + n, { opacity: 0 });
+            // sale siempre (aunque la toma siguiente oculte la columna, puede volver a mostrarse después). Con el
+            // teléfono sale cuando la cámara se acerca: el teléfono y la tarjeta crecen y se le montaban encima.
+            if (toma === "telefono") tl.to("#t" + n, { opacity: 0, y: -40, duration: 0.25, ease: "power2.in" }, t + 1.15);
+            else if (!ultima) tl.to("#t" + n, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, fin - 0.2);
+          } else tl.set("#t" + n, { opacity: 0 }, 0);
           tl.fromTo("#indiceNum span", { yPercent: -100 * Math.max(0, i - 1) }, { yPercent: -100 * i, duration: 0.4, ease: "power3.out", immediateRender: !i }, t);
 
           if (toma === "telefono") {
@@ -701,15 +705,20 @@
             tl.fromTo(cam, { ...desde }, { ...pose(i), duration: seguido ? 0.7 : 0.85, ease: seguido ? P.camEase : "power4.out", onUpdate: aplicar, immediateRender: !camLista }, t - (seguido ? 0.2 : 0.25));
             camLista = true;
             tl.fromTo(cam, { ...pose(i) }, { ...acercar(i), duration: 0.55, ease: "power3.inOut", onUpdate: aplicar, immediateRender: false }, t + 1.2);
-            // la captura de este beneficio sube; la anterior se va con paralaje
+            // la captura de este beneficio sube por encima de las demás; la anterior se va con paralaje
+            // (z-index en la línea de tiempo: el render por partes no siempre respeta el orden del DOM)
+            [1, 2, 3].forEach((k) => tl.set("#p" + k, { zIndex: k === n ? 2 : 1 }, t - 0.2));
             tl.fromTo("#p" + n, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "power4.inOut" }, t - 0.2);
             if (seguido) tl.fromTo("#p" + i, { yPercent: 0 }, { yPercent: -30, duration: 0.6, ease: "power4.inOut", immediateRender: false }, t - 0.2);
             // z: la tarjeta flota delante del teléfono (va en GSAP, no en CSS, para no pisar el transform)
             tarjeta($("tj" + n), t + 0.45, 140);
+            // al acercarse, la tarjeta se arrima al teléfono para no salirse del cuadro
+            if ($("tj" + n)) tl.fromTo("#tj" + n, { x: 0 }, { x: (V.espejo ? -1 : 1) * telH * 0.16, duration: 0.55, ease: "power3.inOut", immediateRender: false }, t + 1.2);
             if ($("tj" + n) && !ultima) tl.to("#tj" + n, { opacity: 0, scale: 0.85, duration: 0.2, ease: "power2.in" }, fin - 0.2);
           } else {
-            if ($("tj" + n)) gsap.set("#tj" + n, { opacity: 0 });
-            gsap.set("#p" + n, { yPercent: 100 });
+            if ($("tj" + n)) tl.set("#tj" + n, { opacity: 0 }, 0);
+            // dentro de la línea de tiempo (un gsap.set suelto se pierde al renderizar por partes)
+            tl.set("#p" + n, { yPercent: 100 }, 0);
             const capa = "#capa" + n;
             tl.fromTo(capa, { opacity: 0 }, { opacity: 1, duration: 0.01 }, t - 0.2);
             if (!ultima) tl.to(capa, { opacity: 0, duration: 0.2, ease: "power2.in" }, fin - 0.2);
@@ -750,7 +759,7 @@
         // en horizontal, según la variante, el cierre va centrado o con el teléfono al lado
         $("sCierre").dataset.tipo = V.cierre;
         if (V.cierre === "lado") {
-          gsap.set("#cierreTel", { transformPerspective: PERSPECTIVA });
+          tl.set("#cierreTel", { transformPerspective: PERSPECTIVA }, 0);
           tl.fromTo("#cierreTel", { y: 800, rotation: 14 * V.signo, rotationY: -30 * V.signo }, { y: 0, rotation: -5 * V.signo, rotationY: -14 * V.signo, duration: 0.9, ease: "power4.out" }, t + 0.45);
         }
         const logoDesde = P.entrada === "golpe" ? { scale: P.golpe, opacity: 0, filter: "blur(12px)" } : P.entrada === "rebote" ? { scale: 0, opacity: 1 } : { y: 40, opacity: 0 };
@@ -801,8 +810,8 @@
       Promise.all([...document.fonts].map((f) => f.load().catch(() => null))).then(() => {
         // capas de transición fuera de cuadro hasta su corte
         if ([P.trans, V.trans2].includes("barras")) $("trBarras").innerHTML = Array.from({ length: 6 }, (_, i) => `<i class="tr-barra" style="left:calc(${i} * 100% / 6)"></i>`).join("");
-        gsap.set("#trBarras .tr-barra", { scaleY: 0 });
-        gsap.set("#trPagina", { yPercent: 100 });
+        tl.set("#trBarras .tr-barra", { scaleY: 0 }, 0);
+        tl.set("#trPagina", { yPercent: 100 }, 0);
         // se mide con todas las escenas visibles, aunque el reproductor tenga ocultas las que aún no empiezan
         const escenas = [...document.querySelectorAll(".escena")];
         const antes = escenas.map((e) => e.style.display);
