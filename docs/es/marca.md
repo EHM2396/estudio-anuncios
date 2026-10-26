@@ -23,10 +23,10 @@ marcas/agendita/
 {
   "origen": "C:\\proyectos\\agendita",
   "idioma": "es",
-  "estilos": { "imagenes": "oscuro", "video": "oscuro" },
+  "direccion": "cercano",
+  "estilos": { "video": "oscuro" },
   "reglas": ["No decir que es la app número uno.", "Hablar de tú, tono cercano."],
-  "plantilla": "app-promo",
-  "plantillaImagenes": "piezas",
+  "video": { "gancho": "chat", "foco": [0.25, 0.4, 0.3] },
   "fuentes": {
     "500": "fuentes/Inter-Medium.ttf",
     "600": "fuentes/Inter-SemiBold.ttf",
@@ -82,6 +82,21 @@ marcas/agendita/
     },
     "velocidad": { "beneficio2": 1.1 }
   },
+  "ganchos": [
+    {
+      "formula": "Pregunta de situación",
+      "pantalla": ["¿Otra vez una cita", "que se te olvidó?"],
+      "voz": "¿Otra vez una cita que se te olvidó?",
+      "puntaje": 76
+    },
+    {
+      "formula": "Deja de",
+      "pantalla": ["Deja de confirmar", "citas a mano."],
+      "voz": "Deja de confirmar citas una por una.",
+      "imagen": { "titulo": "Deja de confirmar citas a mano.", "resaltado": "a mano.", "subtitulo": "Agendita le escribe a cada cliente por ti." },
+      "puntaje": 74
+    }
+  ],
   "imagenes": {
     "pregunta": {
       "titulo": "¿Otra vez una cita que se te olvidó?",
@@ -124,10 +139,12 @@ marcas/agendita/
 |---|---|
 | `origen` | Ruta del proyecto analizado. La skill la usa para reconocer la marca la próxima vez. |
 | `idioma` | Idioma de los anuncios (`es`, `en`…). |
-| `estilos` | Estilo visual por defecto de `imagenes` y `video`: `oscuro`, `claro`, `color` o `minimal`. |
+| `direccion` | Dirección creativa de las imágenes: `editorial`, `poster`, `datos`, `nocturno`, `cercano` o `clasica` (por defecto). Ver [direcciones.md](direcciones.md). |
+| `estilos` | Estilo de color de la dirección clásica, para `imagenes` y `video`: `oscuro`, `claro`, `color` o `minimal`. |
 | `reglas` | Cosas que los textos y la voz siempre deben respetar (frases prohibidas, tono, claims que no se pueden hacer). |
-| `plantilla` | Plantilla del video (por defecto `app-promo`). |
-| `plantillaImagenes` | Plantilla de las imágenes (por defecto `piezas`). |
+| `plantilla` | Plantilla del video (por defecto `promo`). |
+| `video` | Opcional. `gancho`: tipo de gancho del video, `golpe`, `demo` (la cámara arranca pegada a la app) o `chat` (burbuja de chat); si falta, se elige solo según la dirección y la fórmula del gancho. `foco`: qué parte de cada pantalla acerca la cámara en cada beneficio, de 0 (arriba) a 1 (abajo), por ejemplo `[0.25, 0.5, 0.3]`. |
+| `plantillaImagenes` | Copia propia de la plantilla clásica de imágenes (por ejemplo, con el logo más grande). Solo se usa con la dirección `clasica`. |
 
 ### `archivos` y `fuentes`
 
@@ -192,8 +209,21 @@ Textos propios de cada pieza, distintos a los del video.
 
 Los valores por defecto de `vozId`, `modelo` e `idioma` salen de `config.local.json → voz` del repo y, si no hay, de `config.json → voz`.
 
+### `ganchos`
+
+Variantes de gancho para probar cuál retiene más (ver [ganchos.md](ganchos.md)). El gancho que sale por defecto es el de `textos.hookLinea1/2`, `voz.guion.gancho` e `imagenes.pregunta`; con `--gancho N` se usa el número N de esta lista en su lugar.
+
+| Campo | Qué es |
+|---|---|
+| `formula` | Nombre de la fórmula de [ganchos.md](ganchos.md#fórmulas). |
+| `pantalla` | Las dos líneas del gancho en pantalla (≤ 22 caracteres cada una; la segunda va resaltada). |
+| `voz` | La frase hablada. Su audio va en `voz/gancho-N.mp3`. |
+| `imagen` | Opcional: `titulo`, `resaltado` y `subtitulo` de la pieza "pregunta". Si falta, el título son las dos líneas de `pantalla`. |
+| `puntaje` | El que dio `node anunciar.mjs ganchos`. |
+
 ## Reglas para los textos
 
+- Ganchos según [ganchos.md](ganchos.md): sin preámbulo, lo importante en las primeras 3 palabras y una situación concreta.
 - Nada de claims inventados: ni número de usuarios, ni porcentajes de mejora, ni premios. Los montos y datos de ejemplo que se ven dentro de la interfaz sí valen.
 - Beneficios concretos en lugar de funciones ("Sabes cuánto ganas", no "Módulo de reportes").
 - Respeta las `reglas` de la marca.

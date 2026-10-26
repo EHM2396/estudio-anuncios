@@ -18,11 +18,12 @@ Todo es interactivo, por menús, y nada se pierde: cada versión queda guardada.
 ## Qué hace
 
 - **Analiza tu proyecto** y propone ángulos de anuncio basados en funciones reales, sin claims inventados.
+- **Ganchos que retienen:** escribe varios ganchos con fórmulas probadas, los puntúa y te deja generar el mismo anuncio con 2 o 3 ganchos distintos para probar cuál retiene más. Ver [Ganchos y retención](docs/es/ganchos.md).
 - **Crea la marca sola:** colores, logos, fuentes, capturas y textos. No tienes que crear carpetas ni archivos.
 - **Imágenes publicitarias:** 5 piezas diseñadas (pregunta, beneficio, número, lista, antes/después) en horizontal 1920×1080, vertical 1080×1920 y 4:5 1080×1350.
-- **Video animado de 14 s:** gancho, 3 beneficios con la app en un teléfono y cierre con botón e insignias, en horizontal y vertical.
+- **Video animado de 14 s que engancha:** el gancho cae con golpe desde el primer fotograma, la cámara gira en 3D alrededor del teléfono y se acerca a los detalles de la app, hay transiciones con carácter y el botón se presiona al final. Se mueve según la dirección creativa y lleva efectos de sonido sincronizados. **Cada video que generas sale distinto:** cambian las tomas de cada beneficio (teléfono, captura en grande, cifra gigante o solo tipografía), el orden de las capturas, los giros de cámara, el gancho y el cierre. En horizontal, vertical y 4:5.
 - **Voz y música** con [ElevenLabs](https://elevenlabs.io), opcionales y aparte. El audio se masteriza al volumen estándar de redes.
-- **4 estilos visuales:** oscuro, claro, color y minimal.
+- **6 direcciones creativas** para que cada proyecto tenga su propio diseño y no solo otro color: editorial, póster, datos, nocturno, cercano y clásica. Las ves lado a lado antes de elegir. Ver [Direcciones creativas](docs/es/direcciones.md).
 - **Revisión y versiones:** después de cada resultado eliges aprobar, ajustar, pedir otras diferentes o volver a una versión anterior.
 - **Por fases, para no gastar de más:** imágenes y video son gratis. La voz y la música, que cuestan créditos, solo se generan cuando ya te gustó el video.
 
@@ -74,16 +75,16 @@ Para actualizar: `git pull` dentro de esa carpeta.
 La skill revisa los requisitos, analiza el proyecto y te muestra un resumen. Después te pregunta:
 - **de qué hacer publicidad:** de 3 a 4 ángulos, cada uno con su gancho y su público;
 - lo que no pudo deducir: dónde se descarga, si es gratis, el tono;
-- el **idioma** y el **estilo visual**.
+- el **idioma**.
 
-Con eso crea la marca automáticamente.
+Con eso crea la marca automáticamente y te muestra 3 **direcciones creativas** con tu marca, lado a lado, para que elijas la que va con su personalidad.
 
 ### 2. Menú principal
 
 | Opción | Qué hace | Costo |
 |---|---|---|
 | **Imágenes** | 5 anuncios fijos en los formatos que elijas | gratis |
-| **Video sin audio** | El video animado, para revisarlo antes de gastar | gratis |
+| **Video sin voz** | El video animado con efectos de sonido, para revisarlo antes de gastar | gratis |
 | **Video con voz y música** | Le agrega voz y música al video que ya viste | créditos de ElevenLabs |
 | **Terminar** | Resumen de lo aprobado y dónde está | — |
 
@@ -95,7 +96,7 @@ El menú vuelve después de cada paso, así que puedes hacer imágenes, luego el
 |---|---|
 | **Me gusta** | Se aprueba y se copia a `aprobado/`, lista para subir. |
 | **Ajustar algo** | Dices el cambio con tus palabras (textos, colores, capturas, botón, una pieza sola…) y sale una versión nueva. |
-| **Hacer otras diferentes** | Otro mensaje (otro ángulo y otros textos), otro estilo visual o las dos cosas. |
+| **Hacer otras diferentes** | Otro gancho (prueba A/B), otro mensaje (otro ángulo y otros textos), otra dirección creativa o mensaje y dirección a la vez. |
 | **Volver a una versión anterior** | La apruebas tal cual o sigues ajustando desde ahí. |
 
 ### Otros usos
@@ -113,7 +114,7 @@ Anuncios/
   marcas/<marca>/            ← marca.json, logos, capturas, fuentes, voz/, musica.mp3
   salidas/<marca>/
     imagenes/v1, v2, …/<formato>/<pieza>.png
-    videos/v1, v2, …/<marca>-<formato>[-sin-audio].mp4
+    videos/v1, v2, …/<marca>-<formato>[-sin-voz|-sin-audio].mp4
     aprobado/                ← solo lo aprobado: lo que subes a redes
   plantillas/                ← plantillas propias (opcional)
 ```
@@ -144,8 +145,10 @@ El script se puede usar directamente:
 
 ```bash
 node anunciar.mjs verificar                    # requisitos + carpeta de datos
+node anunciar.mjs ganchos "hablado | pantalla" # puntúa uno o varios ganchos
+node anunciar.mjs <marca> muestras            # 2 piezas de cada dirección, lado a lado (no crea versión)
 node anunciar.mjs <marca> imagenes             # imágenes (versión nueva)
-node anunciar.mjs <marca> video                # video sin audio (versión nueva)
+node anunciar.mjs <marca> video --sfx          # video sin voz, con efectos de sonido (versión nueva)
 node anunciar.mjs <marca> final                # video con voz y música de la carpeta de la marca
 node anunciar.mjs <marca> versiones            # lista de versiones y cuál está aprobada
 node anunciar.mjs <marca> aprobar imagenes v3  # copia a aprobado/
@@ -155,22 +158,46 @@ node anunciar.mjs <marca> restaurar video v1   # vuelve marca.json a como estaba
 Opciones:
 - `--formatos horizontal,vertical,4x5`: solo esos formatos.
 - `--piezas numero,lista`: rehace solo esas imágenes.
-- `--estilo oscuro|claro|color|minimal`: estilo visual.
+- `--direccion editorial|poster|datos|nocturno|cercano|clasica`: dirección creativa de las imágenes en esta corrida.
+- `--direcciones editorial,datos`: (con `muestras`) solo esas direcciones.
+- `--estilo oscuro|claro|color|minimal`: estilo de color de la dirección clásica de las imágenes (y de la plantilla de video anterior, `app-promo`).
+- `--sfx`: (video) incluye los efectos de sonido en el video sin voz. En `final` van siempre.
+- `--variante 7`: (video) repite las tomas y movimientos de esa variante. Sin la opción, cada versión usa su número y sale distinta.
+- `--gancho 1,2,3`: usa esos ganchos de `ganchos` en `marca.json`, una versión por gancho.
 - `--nota "qué cambió"`: describe la versión.
 - `--borrador`: render rápido.
 - `--preparar`: arma el proyecto de HyperFrames para abrirlo en su Studio (`npx hyperframes preview`).
 
-## Estilos
+## Direcciones creativas
 
-| Estilo | Cómo se ve |
+Cada dirección es un diseño completo: tipografía, composición, formas y cómo se muestra la app. La marca pone sus colores, logo y capturas.
+
+| Dirección | Cómo se ve |
 |---|---|
-| `oscuro` | Fondo oscuro de la marca, con alguna pieza clara |
-| `claro` | Todo sobre fondo blanco o claro |
-| `color` | Fondo del color de acento, con el logo en una placa blanca |
-| `minimal` | Fondo liso y tipografía grande; las imágenes no llevan teléfono |
+| `editorial` | Revista: serif grande, papel, filetes finos, la app como foto con pie |
+| `poster` | Póster: condensada enorme en mayúsculas, colores planos, sombras duras, stickers |
+| `datos` | Suizo: retícula visible, grotesca y mono, teléfono en línea con anotaciones |
+| `nocturno` | Cine: casi negro con luz de color, grano, teléfono flotando con halo |
+| `cercano` | Cálido: redondeada, notas a mano con flechas, burbujas de chat |
+| `clasica` | La original, con 4 estilos de color: `oscuro`, `claro`, `color`, `minimal` |
+
+La dirección también define cómo se mueve el video:
+
+| Dirección | Gancho | Transición | Sonido |
+|---|---|---|---|
+| `poster` | Palabras que caen con escala, giro y sacudida | Zoom con destello | Golpes de bajo |
+| `datos` | Barridos de máscara precisos | Barras de color | Clics y pings |
+| `nocturno` | Desenfoque a nitidez con brillo | Haz de luz | Barridos y destellos |
+| `editorial` | Subidas desde una máscara, elegantes | Cambio de página | Suave, cierra con campana |
+| `cercano` | Burbuja de chat con "escribiendo…" y rebotes | Iris | Pops |
+| `clasica` | Golpe moderado | Zoom | Mezcla |
+
+En todas, la cámara gira alrededor del teléfono entre beneficios y se acerca a un detalle de la app.
 
 ## Documentación
 
+- [Ganchos y retención](docs/es/ganchos.md)
+- [Direcciones creativas](docs/es/direcciones.md)
 - [Formato de la marca (`marca.json`)](docs/es/marca.md)
 - [Plantillas: cómo funcionan y cómo crear una nueva](docs/es/plantillas.md)
 
@@ -195,5 +222,8 @@ Opciones:
 
 - Render con [HyperFrames](https://github.com/heygen-com/hyperframes) (Apache-2.0), animación con [GSAP](https://gsap.com).
 - Fuente por defecto: [Poppins](https://fonts.google.com/specimen/Poppins) (SIL Open Font License, ver `recursos/fuentes/OFL.txt`).
+- Efectos de sonido: la biblioteca de la skill `media-use` de HyperFrames (licencia de Pixabay, uso comercial sin atribución); se toman de ahí al generar, no vienen en el repo.
+- Tipografías de las direcciones: Instrument Serif, Anton, Space Grotesk, JetBrains Mono, Sora, Fredoka y Caveat, de [Google Fonts](https://fonts.google.com) (SIL Open Font License, cada una con su `recursos/fuentes/<Familia>-OFL.txt`).
 - Voz y música: [ElevenLabs](https://elevenlabs.io), con la cuenta de cada usuario.
+- Fórmulas y puntaje de ganchos adaptados de [instagram-agent-skill](https://github.com/Jakeschincariol/instagram-agent-skill) (MIT) y [viral-hooks](https://github.com/omer-metin/skills-for-antigravity) (Apache-2.0).
 - Código bajo licencia [MIT](LICENSE).

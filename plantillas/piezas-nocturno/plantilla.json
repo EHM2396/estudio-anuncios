@@ -1,0 +1,49 @@
+{
+  "nombre": "piezas-nocturno",
+  "tipo": "imagenes",
+  "descripcion": "Dirección nocturno: cinematográfica. Casi negro con luz del color de acento, grano, geométrica centrada, el teléfono flotando con halo y tarjetas de vidrio.",
+  "direccion": {
+    "id": "nocturno",
+    "nombre": "Nocturno",
+    "sensacion": "Premium, dramática, tecnológica",
+    "idealPara": "Tecnología, IA, productos premium, lanzamientos con misterio, apps con interfaz oscura"
+  },
+  "formatos": {
+    "horizontal": {
+      "ancho": 1920,
+      "alto": 1080
+    },
+    "vertical": {
+      "ancho": 1080,
+      "alto": 1920
+    },
+    "4x5": {
+      "ancho": 1080,
+      "alto": 1350
+    }
+  },
+  "piezas": [
+    "pregunta",
+    "beneficio",
+    "numero",
+    "lista",
+    "antes-despues"
+  ],
+  "archivos": [
+    "logo",
+    "logoClaro",
+    "insignia",
+    "pantalla1",
+    "pantalla2",
+    "pantalla3"
+  ],
+  "pesosFuente": [
+    "500",
+    "600",
+    "700"
+  ],
+  "recursos": {
+    "assets/comun.js": "piezas/comun.js",
+    "assets/fuentes/Sora-Variable.ttf": "fuentes/Sora-Variable.ttf"
+  }
+}

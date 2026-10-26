@@ -1,0 +1,41 @@
+{
+  "nombre": "promo",
+  "descripcion": "Promo por escenas, 14 s: gancho con golpe, 3 beneficios con la cámara 3D alrededor del teléfono y acercamiento a un detalle, y cierre con el botón que se presiona. Se mueve según la dirección creativa de la marca.",
+  "duracion": 14,
+  "formatos": {
+    "horizontal": { "ancho": 1920, "alto": 1080 },
+    "vertical": { "ancho": 1080, "alto": 1920 },
+    "4x5": { "ancho": 1080, "alto": 1350 }
+  },
+  "archivos": ["logo", "logoClaro", "insignia", "pantalla1", "pantalla2", "pantalla3"],
+  "pesosFuente": ["500", "600", "700"],
+  "direcciones": ["clasica", "poster", "datos", "nocturno", "editorial", "cercano"],
+  "ganchos": ["golpe", "demo", "chat"],
+  "voz": {
+    "gancho": { "inicio": 0.3, "max": 2.5 },
+    "beneficio1": { "inicio": 2.8, "max": 2.35 },
+    "beneficio2": { "inicio": 5.15, "max": 2.25 },
+    "beneficio3": { "inicio": 7.4, "max": 2.5 },
+    "cierre": { "inicio": 9.9, "max": 4.1 }
+  },
+  "volumenMusica": 0.18,
+  "sfx": {
+    "clasica": [[0, "whoosh-short", 0.35], [1.15, "impact-bass-1", 0.5], [2.27, "whoosh", 0.4], [3.0, "pop", 0.35], [5.4, "pop", 0.35], [7.8, "pop", 0.35], [9.47, "whoosh", 0.4], [10.05, "impact-bass-1", 0.45], [12.15, "click", 0.45]],
+    "poster": [[0, "impact-bass-1", 0.55], [1.15, "impact-bass-1", 0.6], [2.3, "whoosh", 0.45], [2.6, "whoosh-short", 0.35], [3.0, "pop", 0.4], [5.0, "whoosh-short", 0.35], [5.4, "pop", 0.4], [7.4, "whoosh-short", 0.35], [7.8, "pop", 0.4], [9.5, "whoosh", 0.45], [10.05, "impact-bass-1", 0.55], [12.15, "click", 0.5]],
+    "datos": [[0, "key-press", 0.4], [1.15, "glitch-1", 0.3], [2.2, "whoosh-short", 0.35], [2.6, "click", 0.35], [3.0, "ping", 0.3], [5.0, "click", 0.35], [5.4, "ping", 0.3], [7.4, "click", 0.35], [7.8, "ping", 0.3], [9.4, "whoosh-short", 0.35], [10.05, "glitch-3", 0.3], [12.15, "click", 0.45]],
+    "nocturno": [[0, "whoosh-short", 0.35], [1.15, "impact-bass-1", 0.5], [2.27, "whoosh", 0.4], [3.0, "ping", 0.3], [5.4, "ping", 0.3], [7.8, "ping", 0.3], [9.47, "whoosh", 0.4], [10.05, "sparkle", 0.4], [12.15, "click", 0.45]],
+    "editorial": [[0, "whoosh-short", 0.25], [1.15, "click-soft", 0.4], [2.2, "whoosh-short", 0.3], [3.0, "click-soft", 0.35], [5.4, "click-soft", 0.35], [7.8, "click-soft", 0.35], [9.4, "whoosh-short", 0.3], [10.05, "chime", 0.35], [12.15, "click-soft", 0.45]],
+    "cercano": [[0, "typing", 0.25], [0.35, "pop", 0.4], [1.15, "pop", 0.45], [2.4, "whoosh-short", 0.35], [3.0, "pop", 0.4], [5.4, "pop", 0.4], [7.8, "pop", 0.4], [9.6, "whoosh-short", 0.35], [10.05, "chime", 0.35], [12.15, "click", 0.45]]
+  },
+  "recursos": {
+    "assets/comun.js": "piezas/comun.js",
+    "assets/fuentes/Anton-Regular.ttf": "fuentes/Anton-Regular.ttf",
+    "assets/fuentes/InstrumentSerif-Regular.ttf": "fuentes/InstrumentSerif-Regular.ttf",
+    "assets/fuentes/InstrumentSerif-Italic.ttf": "fuentes/InstrumentSerif-Italic.ttf",
+    "assets/fuentes/SpaceGrotesk-Variable.ttf": "fuentes/SpaceGrotesk-Variable.ttf",
+    "assets/fuentes/JetBrainsMono-Variable.ttf": "fuentes/JetBrainsMono-Variable.ttf",
+    "assets/fuentes/Sora-Variable.ttf": "fuentes/Sora-Variable.ttf",
+    "assets/fuentes/Fredoka-Variable.ttf": "fuentes/Fredoka-Variable.ttf",
+    "assets/fuentes/Caveat-Variable.ttf": "fuentes/Caveat-Variable.ttf"
+  }
+}

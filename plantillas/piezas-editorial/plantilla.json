@@ -1,0 +1,24 @@
+{
+  "nombre": "piezas-editorial",
+  "tipo": "imagenes",
+  "descripcion": "Dirección editorial: revista. Serif grande, papel, filetes finos y la app como foto con pie de foto.",
+  "direccion": {
+    "id": "editorial",
+    "nombre": "Editorial",
+    "sensacion": "Calmada, confiable, premium",
+    "idealPara": "Finanzas, servicios profesionales, salud, educación, marcas que quieren verse serias"
+  },
+  "formatos": {
+    "horizontal": { "ancho": 1920, "alto": 1080 },
+    "vertical": { "ancho": 1080, "alto": 1920 },
+    "4x5": { "ancho": 1080, "alto": 1350 }
+  },
+  "piezas": ["pregunta", "beneficio", "numero", "lista", "antes-despues"],
+  "archivos": ["logo", "logoClaro", "insignia", "pantalla1", "pantalla2", "pantalla3"],
+  "pesosFuente": ["500", "600", "700"],
+  "recursos": {
+    "assets/comun.js": "piezas/comun.js",
+    "assets/fuentes/InstrumentSerif-Regular.ttf": "fuentes/InstrumentSerif-Regular.ttf",
+    "assets/fuentes/InstrumentSerif-Italic.ttf": "fuentes/InstrumentSerif-Italic.ttf"
+  }
+}

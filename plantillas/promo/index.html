@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/comun.js"></script>
+    <style>
+      /* Promo por escenas: gancho con golpe, 3 beneficios con cámara 3D alrededor del teléfono y
+         acercamiento a un detalle, cierre con el botón que se presiona. La dirección creativa
+         (data-direccion en #root) cambia tipografía, colores, formas, transiciones y la forma de moverse. */
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-500.ttf"); font-weight: 500; }
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-600.ttf"); font-weight: 600; }
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-700.ttf"); font-weight: 700; }
+      @font-face { font-family: "Anton"; src: url("assets/fuentes/Anton-Regular.ttf"); }
+      @font-face { font-family: "Instrument"; src: url("assets/fuentes/InstrumentSerif-Regular.ttf"); font-style: normal; }
+      @font-face { font-family: "Instrument"; src: url("assets/fuentes/InstrumentSerif-Italic.ttf"); font-style: italic; }
+      @font-face { font-family: "Grotesk"; src: url("assets/fuentes/SpaceGrotesk-Variable.ttf"); font-weight: 300 700; }
+      @font-face { font-family: "Mono"; src: url("assets/fuentes/JetBrainsMono-Variable.ttf"); font-weight: 100 800; }
+      @font-face { font-family: "Sora"; src: url("assets/fuentes/Sora-Variable.ttf"); font-weight: 100 800; }
+      @font-face { font-family: "Fredoka"; src: url("assets/fuentes/Fredoka-Variable.ttf"); font-weight: 300 700; }
+      @font-face { font-family: "Caveat"; src: url("assets/fuentes/Caveat-Variable.ttf"); font-weight: 400 700; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+      /* ================= Base (dirección clásica) ================= */
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Marca", sans-serif;
+        /* fondos y texto de cada escena */
+        --bgG: radial-gradient(120% 100% at 70% 20%, var(--colorFondo), var(--colorFondo2) 70%);
+        --txG: #fff;
+        --bgB: radial-gradient(120% 100% at 80% 20%, #fff, var(--colorClaro) 65%);
+        --txB: var(--colorFondo2);
+        --bgC: radial-gradient(120% 100% at 50% 30%, var(--colorFondo), var(--colorFondo2) 75%);
+        --txC: #fff;
+        --suaveB: color-mix(in srgb, var(--colorFondo2) 65%, transparent);
+        /* tipografía de títulos */
+        --fTit: "Marca", sans-serif;
+        --wTit: 700;
+        --casoTit: none;
+        --lsTit: -0.035em;
+        --lhTit: 1.02;
+        /* medidas por formato */
+        --pad-x: 120px;
+        --pad-y: 100px;
+        /* el ancho sale de la proporción de las capturas (--ar-tel, la pone el JS): así no se recortan */
+        --tel-w: calc((var(--tel-h) - 28px) * var(--ar-tel, 0.583) + 28px);
+        --tel-h: 920px;
+        --tam-gancho: 170px;
+        --tam-titulo: 104px;
+        --tam-eslogan: 120px;
+      }
+      #root[data-formato="vertical"] { --pad-x: 80px; --pad-y: 230px; --tel-h: 1080px; --tam-gancho: 150px; --tam-titulo: 100px; --tam-eslogan: 110px; }
+      #root[data-formato="4x5"] { --pad-x: 72px; --pad-y: 80px; --tel-h: 720px; --tam-gancho: 130px; --tam-titulo: 80px; --tam-eslogan: 96px; }
+
+      .escena { position: absolute; inset: 0; overflow: hidden; }
+      .marco, .sacudida, .cam { position: absolute; inset: 0; }
+      .marco { will-change: transform, opacity, filter; }
+      #sGancho { z-index: 1; }
+      #sBen { z-index: 2; }
+      #sCierre { z-index: 3; }
+      #sTrans { z-index: 10; pointer-events: none; }
+      #sGancho .marco { background: var(--bgG); color: var(--txG); }
+      #sBen .marco { background: var(--bgB); color: var(--txB); }
+      #sCierre .marco { background: var(--bgC); color: var(--txC); }
+      .deco { position: absolute; inset: 0; pointer-events: none; }
+
+      .tit {
+        font-family: var(--fTit);
+        font-weight: var(--wTit);
+        text-transform: var(--casoTit);
+        letter-spacing: var(--lsTit);
+        line-height: var(--lhTit);
+        text-wrap: balance;
+      }
+      .w { display: inline-block; }
+      .wi { display: inline-block; will-change: transform, opacity, filter; }
+      .resaltado { color: var(--colorAcento); }
+
+      /* ---------- Gancho ---------- */
+      #ganchoCaja { position: absolute; z-index: 2; left: var(--pad-x); right: var(--pad-x); top: var(--pad-y); bottom: var(--pad-y); display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+      #ganchoTxt .linea { display: block; }
+      #ganchoRaya { display: block; width: 260px; height: 14px; margin-top: 40px; background: var(--colorAcento); transform-origin: left center; }
+      #ganchoTel { position: absolute; left: 50%; top: 50%; width: var(--tel-w); height: var(--tel-h); margin: calc(var(--tel-h) / -2) 0 0 calc(var(--tel-w) / -2); display: none; }
+      #sGancho[data-tipo="demo"] #ganchoTel { display: block; }
+      #sGancho[data-tipo="demo"] #ganchoCaja { right: 52%; }
+      #sGancho[data-tipo="chat"] #ganchoCaja { align-items: flex-start; }
+      /* #burbuja envuelve el texto del gancho; solo en el tipo "chat" se ve como burbuja */
+      #burbuja { position: relative; max-width: 100%; font-size: var(--tam-gancho); }
+      #ganchoTxt { font-size: 1em; }
+      #escribiendo { display: none; gap: 18px; align-self: flex-start; padding: 34px 40px; border-radius: 56px 56px 56px 16px; background: #fff; margin-bottom: 30px; }
+      #escribiendo i { width: 22px; height: 22px; border-radius: 50%; background: var(--colorFondo); }
+      #sGancho[data-tipo="chat"] #burbuja { padding: 0.32em 0.42em 0.38em; border-radius: 0.42em 0.42em 0.42em 0.12em; background: #fff; color: var(--colorFondo2); box-shadow: 0 0.08em 0 color-mix(in srgb, var(--colorFondo) 14%, transparent); }
+      #sGancho[data-tipo="chat"] #escribiendo { display: flex; }
+
+      /* ---------- Teléfono (gancho demo y beneficios) ---------- */
+      .tel { position: absolute; width: var(--tel-w); height: var(--tel-h); padding: 14px; border-radius: 64px; background: linear-gradient(155deg, #2b3133, #0b0f10 50%, #1e2426); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) inset, 0 60px 120px rgba(0, 0, 0, 0.35); }
+      .tel .pantalla { position: relative; width: 100%; height: 100%; border-radius: 50px; overflow: hidden; background: #fff; }
+      .tel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+
+      /* ---------- Beneficios ---------- */
+      .barra { position: absolute; left: var(--pad-x); top: calc(var(--pad-y) * 0.6); z-index: 3; }
+      .logo { display: block; width: 320px; height: 64px; object-fit: contain; object-position: left center; }
+      .copia { position: absolute; z-index: 3; left: var(--pad-x); top: 50%; width: 780px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; }
+      #kicker { align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; padding: 10px 22px; border-radius: 999px; font-size: 24px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; background: color-mix(in srgb, var(--colorAcento) 22%, transparent); color: var(--colorFondo); }
+      #titulos { display: grid; height: 430px; }
+      /* cada título ocupa toda la caja (para poder medir si cabe) y se centra en alto */
+      #titulos .tit { grid-area: 1 / 1; font-size: var(--tam-titulo); display: flex; align-items: center; overflow: hidden; }
+      #indice { display: flex; align-items: center; gap: 18px; font-size: 26px; font-weight: 700; color: var(--suaveB); }
+      #indiceNum { position: relative; height: 1.2em; overflow: hidden; color: var(--txB); }
+      #indiceNum span { display: block; height: 1.2em; }
+      #indiceRaya { width: 120px; height: 3px; background: currentColor; opacity: 0.4; }
+      .escenario { position: absolute; z-index: 2; right: 0; top: 0; bottom: 0; width: 56%; perspective: 2200px; }
+      #mundo { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; will-change: transform; }
+      #mundo .tel { left: calc(var(--tel-w) / -2); top: calc(var(--tel-h) / -2); }
+      .tarjeta { position: absolute; z-index: 4; display: flex; align-items: center; gap: 18px; padding: 20px 30px 20px 20px; border-radius: 24px; background: #fff; color: var(--colorFondo2); box-shadow: 0 26px 50px rgba(0, 0, 0, 0.22); white-space: nowrap; left: calc(var(--tel-w) * -0.95); top: calc(var(--tel-h) * 0.14); }
+      .tarjeta .ico { width: 58px; height: 58px; border-radius: 17px; display: grid; place-items: center; background: var(--colorAcento); color: var(--colorSobreAcento); flex: none; }
+      .tarjeta .ico svg { width: 30px; height: 30px; }
+      .tarjeta small { display: block; font-size: 22px; font-weight: 500; opacity: 0.7; }
+      .tarjeta strong { display: block; font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+      .tarjeta .tjv { display: inline-block; }
+
+      /* ---------- Cierre ---------- */
+      #cierreCol { position: absolute; left: var(--pad-x); right: var(--pad-x); top: var(--pad-y); bottom: var(--pad-y); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 34px; text-align: center; }
+      #cierreLogo { width: 560px; height: 120px; object-position: center; }
+      #eslogan { font-size: var(--tam-eslogan); max-width: 1500px; }
+      #ctaFila { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 24px; }
+      #boton { position: relative; display: inline-flex; align-items: center; gap: 16px; height: 100px; padding: 0 52px; border-radius: 999px; font-size: 40px; font-weight: 700; background: var(--colorAcento); color: var(--colorSobreAcento); overflow: hidden; }
+      #boton svg { width: 36px; height: 36px; }
+      #onda { position: absolute; left: 50%; top: 50%; width: 140px; height: 140px; margin: -70px 0 0 -70px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); opacity: 0; }
+      #tienda { display: flex; align-items: center; gap: 18px; }
+      #insignia { height: 78px; display: block; }
+      #insigniaWeb { height: 78px; display: flex; align-items: center; gap: 12px; padding: 0 24px 0 16px; border-radius: 12px; background: #000; color: #fff; border: 1.5px solid #a6a6a6; text-align: left; }
+      #insigniaWeb svg { width: 40px; height: 40px; }
+      #insigniaWeb small { display: block; font-size: 15px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.1; }
+      #insigniaWeb b { display: block; font-size: 30px; font-weight: 600; line-height: 1.05; }
+      #url { font-size: 30px; font-weight: 600; letter-spacing: 0.04em; opacity: 0.75; }
+
+      /* ---------- Tomas alternativas de un beneficio (según la variante) ---------- */
+      .capa { position: absolute; inset: 0; z-index: 3; }
+      /* captura grande: la pantalla de la app como una lámina, recorrida de arriba abajo */
+      .lamina { position: absolute; right: 7%; top: 9%; width: 44%; bottom: -14%; border-radius: 34px; overflow: hidden; background: #fff; box-shadow: 0 50px 110px rgba(0, 0, 0, 0.3); }
+      .lamina img { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block; }
+      .capa .tarjeta { left: auto; right: calc(7% + 44% - 120px); top: auto; bottom: 16%; }
+      /* cifra enorme contando */
+      .cifra { position: absolute; inset: var(--pad-y) var(--pad-x); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; text-align: center; }
+      .cifra .etq { font-size: 30px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.75; }
+      .cifra .num { font-size: calc(var(--tam-titulo) * 2.8); line-height: 0.95; white-space: nowrap; }
+      .cifra .raya { width: 180px; height: 12px; background: var(--colorAcento); transform-origin: center; }
+      .cifra .tit-c { font-size: calc(var(--tam-titulo) * 0.7); max-width: 1300px; }
+      /* solo tipografía: el beneficio a pantalla completa */
+      .tipo { position: absolute; inset: var(--pad-y) var(--pad-x); display: flex; flex-direction: column; justify-content: center; gap: 40px; }
+      .tipo .tit-t { font-size: calc(var(--tam-titulo) * 1.9); }
+      #capas .tipo .tarjeta { position: relative; left: auto; right: auto; top: auto; bottom: auto; align-self: flex-start; }
+      /* espejo: teléfono a la izquierda y texto a la derecha */
+      #sBen[data-espejo="1"] .copia { left: auto; right: var(--pad-x); }
+      #sBen[data-espejo="1"] .escenario { right: auto; left: 0; }
+      #sBen[data-espejo="1"] .lamina { right: auto; left: 7%; }
+      #sBen[data-espejo="1"] .capa .tarjeta { right: auto; left: calc(7% + 44% - 120px); }
+      #sBen[data-espejo="1"] #mundo .tarjeta { left: calc(var(--tel-w) * 0.3); }
+      [data-formato="vertical"] .lamina { left: 8%; right: 8%; width: auto; top: 50%; bottom: -10%; }
+      [data-formato="4x5"] .lamina { left: 10%; right: 10%; width: auto; top: 46%; bottom: -12%; }
+      [data-formato="vertical"] .capa .tarjeta, [data-formato="4x5"] .capa .tarjeta { right: auto; left: 4%; top: auto; bottom: 8%; }
+      /* la captura grande con el carácter de cada dirección */
+      [data-direccion="poster"] .lamina { border-radius: 0; border: 8px solid var(--colorFondo2); box-shadow: 28px 28px 0 var(--colorAcento); }
+      [data-direccion="datos"] .lamina { border-radius: 0; border: 3px solid var(--colorFondo2); box-shadow: none; }
+      [data-direccion="nocturno"] .lamina { box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.14), 0 60px 120px rgba(0, 0, 0, 0.7), 0 0 90px color-mix(in srgb, var(--colorAcento) 35%, transparent); }
+      [data-direccion="editorial"] .lamina { border-radius: 2px; border: 16px solid #fff; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.35); }
+      [data-direccion="cercano"] .lamina { border-radius: 56px; border: 16px solid var(--colorFondo); box-shadow: 0 30px 70px -20px color-mix(in srgb, var(--colorFondo) 55%, transparent); }
+      /* cierre con el teléfono al lado (solo horizontal) */
+      #cierreTel { display: none; }
+      #sCierre[data-tipo="lado"] #cierreTel { display: block; right: 9%; top: 50%; margin-top: calc(var(--tel-h) * -0.5); }
+      #sCierre[data-tipo="lado"] #cierreCol { right: 44%; align-items: flex-start; text-align: left; }
+      #sCierre[data-tipo="lado"] #cierreLogo { object-position: left center; }
+      #sCierre[data-tipo="lado"] #ctaFila { justify-content: flex-start; }
+
+      /* ---------- Transiciones (capa encima de todo) ---------- */
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+      /* sin transform en el CSS: GSAP fija el estado inicial (si no, suma el del CSS al suyo) */
+      .tr-barra { position: absolute; top: 0; bottom: 0; width: calc(100% / 6 + 2px); background: var(--colorAcento); }
+      #trPagina { position: absolute; inset: 0; background: var(--colorFondo2); }
+      #trLuz { position: absolute; inset: -20%; background: radial-gradient(closest-side, #fff, color-mix(in srgb, var(--colorAcento) 60%, #fff) 45%, transparent 75%); opacity: 0; }
+
+      /* ---------- Vertical y 4:5: texto arriba, teléfono abajo ---------- */
+      [data-formato="vertical"] .copia, [data-formato="4x5"] .copia { top: calc(var(--pad-y) + 110px); right: var(--pad-x); width: auto; transform: none; gap: 22px; }
+      [data-formato="vertical"] #titulos { height: 420px; }
+      [data-formato="4x5"] #titulos { height: 290px; }
+      [data-formato="4x5"] .copia { top: 150px; gap: 16px; }
+      [data-formato="4x5"] #kicker { font-size: 19px; padding: 8px 16px; }
+      [data-formato="4x5"] .logo { width: 260px; height: 52px; }
+      [data-formato="vertical"] .escenario { left: 0; width: auto; top: 980px; }
+      [data-formato="4x5"] .escenario { left: 0; width: auto; top: 560px; }
+      [data-formato="vertical"] .escenario #mundo, [data-formato="4x5"] .escenario #mundo { top: 46%; }
+      [data-formato="vertical"] .tarjeta { left: calc(var(--tel-w) * -0.78); top: calc(var(--tel-h) * 0.08); }
+      [data-formato="4x5"] .tarjeta { left: calc(var(--tel-w) * -0.9); top: calc(var(--tel-h) * 0.06); padding: 14px 22px 14px 14px; }
+      [data-formato="4x5"] .tarjeta strong { font-size: 34px; }
+      [data-formato="4x5"] .tarjeta small { font-size: 18px; }
+      [data-formato="4x5"] .tarjeta .ico { width: 46px; height: 46px; }
+      [data-formato="4x5"] #indice { display: none; }
+      [data-formato="vertical"] #sGancho[data-tipo="demo"] #ganchoCaja, [data-formato="4x5"] #sGancho[data-tipo="demo"] #ganchoCaja { right: var(--pad-x); bottom: 55%; }
+      [data-formato="4x5"] #cierreLogo { width: 440px; height: 96px; }
+      [data-formato="4x5"] #boton { height: 84px; font-size: 34px; padding: 0 40px; }
+      [data-formato="4x5"] #insignia, [data-formato="4x5"] #insigniaWeb { height: 64px; }
+
+      /* ================= Direcciones ================= */
+
+      /* --- Póster: condensada en mayúsculas, colores planos, sombras duras --- */
+      #root[data-direccion="poster"] {
+        --bgG: var(--colorAcento); --txG: var(--colorSobreAcento);
+        --bgB: color-mix(in srgb, var(--colorClaro) 60%, #fff); --txB: var(--colorFondo2);
+        --bgC: var(--colorFondo2); --txC: #fff;
+        --fTit: "Anton", sans-serif; --wTit: 400; --casoTit: uppercase; --lsTit: 0.005em; --lhTit: 0.94;
+        --tam-gancho: 300px; --tam-titulo: 140px; --tam-eslogan: 170px;
+      }
+      #root[data-direccion="poster"][data-formato="vertical"] { --tam-gancho: 250px; --tam-titulo: 130px; --tam-eslogan: 150px; }
+      #root[data-direccion="poster"][data-formato="4x5"] { --tam-gancho: 210px; --tam-titulo: 104px; --tam-eslogan: 130px; }
+      /* cada palabra de la línea clave es una cinta oscura de alto completo */
+      [data-direccion="poster"] #ganchoTxt .l2 { line-height: 1.04; margin-top: 0.06em; }
+      [data-direccion="poster"] #ganchoTxt .l2 .resaltado { background: var(--colorFondo2); color: var(--colorAcento); padding: 0.02em 0.08em 0; }
+      [data-direccion="poster"] #ganchoRaya { display: none; }
+      [data-direccion="poster"] .marcaAgua { position: absolute; right: -4%; bottom: -12%; font-family: "Anton", sans-serif; font-size: 640px; line-height: 0.8; text-transform: uppercase; white-space: nowrap; color: color-mix(in srgb, var(--colorFondo2) 6%, transparent); -webkit-text-stroke: 6px color-mix(in srgb, var(--colorFondo2) 18%, transparent); }
+      [data-direccion="poster"] .tel { background: var(--colorFondo2); border: 8px solid var(--colorFondo2); box-shadow: 30px 30px 0 var(--colorAcento); }
+      [data-direccion="poster"] .tarjeta { border-radius: 0; border: 6px solid var(--colorFondo2); box-shadow: 16px 16px 0 var(--colorFondo2); }
+      [data-direccion="poster"] .tarjeta strong { font-family: "Anton", sans-serif; font-weight: 400; font-size: 60px; text-transform: uppercase; }
+      [data-direccion="poster"] #kicker { border-radius: 0; background: var(--colorFondo2); color: #fff; }
+      [data-direccion="poster"] #kicker b { display: none; }
+      [data-direccion="poster"] .barra { padding: 12px 20px; background: #fff; border: 5px solid var(--colorFondo2); box-shadow: 12px 12px 0 var(--colorFondo2); }
+      [data-direccion="poster"] #boton { border-radius: 0; font-family: "Anton", sans-serif; font-weight: 400; text-transform: uppercase; font-size: 50px; box-shadow: 14px 14px 0 #fff; overflow: visible; }
+      [data-direccion="poster"] #cierreLogo { padding: 18px 30px; background: #fff; box-sizing: content-box; }
+
+      /* --- Datos: retícula, grotesca y mono, líneas finas --- */
+      #root[data-direccion="datos"] {
+        --bgG: color-mix(in srgb, var(--colorClaro) 25%, #fff); --txG: var(--colorFondo2);
+        --bgB: color-mix(in srgb, var(--colorClaro) 25%, #fff); --txB: var(--colorFondo2);
+        --bgC: var(--colorFondo2); --txC: #fff;
+        --fTit: "Grotesk", sans-serif; --wTit: 700; --lsTit: -0.045em; --lhTit: 0.96;
+      }
+      [data-direccion="datos"] .reticula { position: absolute; inset: 0 var(--pad-x); background: repeating-linear-gradient(to right, color-mix(in srgb, currentColor 9%, transparent) 0 1.5px, transparent 1.5px calc((100% - 1.5px) / 12)); border-right: 1.5px solid color-mix(in srgb, currentColor 9%, transparent); transform-origin: top; }
+      [data-direccion="datos"] #ganchoTxt .l2 .resaltado { background: var(--colorAcento); color: var(--colorSobreAcento); padding: 0 0.06em; }
+      [data-direccion="datos"] #ganchoRaya { height: 6px; width: 100%; background: var(--colorFondo2); }
+      [data-direccion="datos"] .meta { position: absolute; left: var(--pad-x); right: var(--pad-x); bottom: calc(var(--pad-y) * 0.5); display: flex; justify-content: space-between; font-family: "Mono", monospace; font-size: 22px; text-transform: uppercase; opacity: 0.6; }
+      [data-direccion="datos"] .tel { background: transparent; border: 3px solid var(--colorFondo2); box-shadow: none; }
+      [data-direccion="datos"] .tarjeta { border-radius: 0; border: 2.5px solid var(--colorFondo2); box-shadow: none; }
+      [data-direccion="datos"] .tarjeta small { font-family: "Mono", monospace; text-transform: uppercase; font-size: 18px; }
+      [data-direccion="datos"] .tarjeta strong { font-family: "Grotesk", sans-serif; }
+      [data-direccion="datos"] .tarjeta .ico { border-radius: 0; }
+      [data-direccion="datos"] #kicker { border-radius: 0; background: none; padding: 0; font-family: "Mono", monospace; font-weight: 500; letter-spacing: 0.02em; color: var(--colorFondo2); }
+      [data-direccion="datos"] #kicker b { width: 18px; height: 18px; background: var(--colorAcento); display: block; }
+      [data-direccion="datos"] #indice { font-family: "Mono", monospace; }
+      [data-direccion="datos"] #boton { border-radius: 0; font-family: "Grotesk", sans-serif; }
+
+      /* --- Nocturno: casi negro, luz del acento, grano, vidrio --- */
+      #root[data-direccion="nocturno"] {
+        --noche: color-mix(in srgb, var(--colorFondo2) 38%, #040507);
+        --bgG: var(--noche); --txG: #fff; --bgB: var(--noche); --txB: #fff; --bgC: var(--noche); --txC: #fff;
+        --suaveB: rgba(255, 255, 255, 0.6);
+        --fTit: "Sora", sans-serif; --wTit: 600; --lsTit: -0.04em; --lhTit: 1.02;
+      }
+      [data-direccion="nocturno"] .luz { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--colorAcento) 55%, transparent), transparent); filter: blur(40px); }
+      [data-direccion="nocturno"] .grano { position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.6)), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>"); }
+      [data-direccion="nocturno"] .resaltado { background: linear-gradient(100deg, #fff 0%, color-mix(in srgb, var(--colorAcento) 70%, #fff) 45%, var(--colorAcento) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      [data-direccion="nocturno"] #ganchoCaja { align-items: center; text-align: center; }
+      [data-direccion="nocturno"] #ganchoRaya { margin: 40px auto 0; height: 4px; box-shadow: 0 0 30px var(--colorAcento); }
+      [data-direccion="nocturno"] .tel { box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.14) inset, 0 70px 120px rgba(0, 0, 0, 0.7), 0 0 90px color-mix(in srgb, var(--colorAcento) 35%, transparent); }
+      [data-direccion="nocturno"] .tarjeta { background: rgba(16, 18, 22, 0.82); color: #fff; border: 1px solid rgba(255, 255, 255, 0.16); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4); }
+      [data-direccion="nocturno"] .tarjeta .ico { box-shadow: 0 0 30px color-mix(in srgb, var(--colorAcento) 60%, transparent); }
+      [data-direccion="nocturno"] #kicker { background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.16); color: rgba(255, 255, 255, 0.85); }
+      [data-direccion="nocturno"] #kicker b { width: 10px; height: 10px; border-radius: 50%; background: var(--colorAcento); box-shadow: 0 0 14px var(--colorAcento); display: block; }
+      [data-direccion="nocturno"] #boton { box-shadow: 0 0 70px color-mix(in srgb, var(--colorAcento) 55%, transparent); }
+
+      /* --- Editorial: serif, papel, filetes --- */
+      #root[data-direccion="editorial"] {
+        --papel: color-mix(in srgb, var(--colorClaro) 35%, #f8f3e9);
+        --bgG: var(--papel); --txG: var(--colorFondo2); --bgB: var(--papel); --txB: var(--colorFondo2); --bgC: var(--colorFondo2); --txC: #f8f3e9;
+        --fTit: "Instrument", serif; --wTit: 400; --lsTit: -0.012em; --lhTit: 0.98;
+        --tam-gancho: 200px; --tam-titulo: 124px; --tam-eslogan: 150px;
+      }
+      #root[data-direccion="editorial"][data-formato="vertical"] { --tam-gancho: 170px; --tam-titulo: 116px; }
+      #root[data-direccion="editorial"][data-formato="4x5"] { --tam-gancho: 140px; --tam-titulo: 92px; --tam-eslogan: 110px; }
+      [data-direccion="editorial"] .resaltado { font-style: italic; color: var(--colorFondo); }
+      [data-direccion="editorial"] #sCierre .resaltado { color: var(--colorAcento); }
+      [data-direccion="editorial"] #ganchoRaya { height: 3px; width: 140px; }
+      [data-direccion="editorial"] .filetes::before, [data-direccion="editorial"] .filetes::after { content: ""; position: absolute; left: var(--pad-x); right: var(--pad-x); height: 1.5px; background: currentColor; opacity: 0.8; }
+      [data-direccion="editorial"] .filetes::before { top: calc(var(--pad-y) * 0.7); }
+      [data-direccion="editorial"] .filetes::after { bottom: calc(var(--pad-y) * 0.7); }
+      [data-direccion="editorial"] .tel { border-radius: 4px; padding: 16px; background: #fff; box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.35); border: 1px solid rgba(0, 0, 0, 0.1); }
+      [data-direccion="editorial"] .tel .pantalla { border-radius: 0; }
+      [data-direccion="editorial"] .tarjeta { border-radius: 2px; background: #f8f3e9; box-shadow: none; border: 1.5px solid var(--colorFondo2); }
+      [data-direccion="editorial"] .tarjeta strong { font-family: "Instrument", serif; font-weight: 400; font-size: 56px; }
+      [data-direccion="editorial"] .tarjeta .ico { display: none; }
+      [data-direccion="editorial"] #kicker { background: none; padding: 0; border-radius: 0; color: var(--colorFondo); }
+      [data-direccion="editorial"] #kicker b { display: none; }
+      [data-direccion="editorial"] #boton { border-radius: 2px; background: #f8f3e9; color: var(--colorFondo2); }
+
+      /* --- Cercano: redondeada, a mano, burbujas, manchas --- */
+      #root[data-direccion="cercano"] {
+        --crema: color-mix(in srgb, var(--colorClaro) 50%, #fff6ea);
+        --bgG: var(--crema); --txG: var(--colorFondo); --bgB: var(--crema); --txB: var(--colorFondo); --bgC: var(--crema); --txC: var(--colorFondo);
+        --suaveB: color-mix(in srgb, var(--colorFondo2) 60%, transparent);
+        --fTit: "Fredoka", sans-serif; --wTit: 600; --lsTit: -0.01em; --lhTit: 1.04;
+        --tam-gancho: 140px;
+      }
+      #root[data-direccion="cercano"][data-formato="vertical"] { --tam-gancho: 116px; }
+      #root[data-direccion="cercano"][data-formato="4x5"] { --tam-gancho: 96px; }
+      [data-direccion="cercano"] .resaltado { color: inherit; background: linear-gradient(176deg, transparent 52%, color-mix(in srgb, var(--colorAcento) 60%, transparent) 54% 90%, transparent 92%); }
+      [data-direccion="cercano"] .mancha { position: absolute; border-radius: 62% 38% 54% 46% / 47% 58% 42% 53%; background: color-mix(in srgb, var(--colorAcento) 32%, transparent); }
+      [data-direccion="cercano"] .mancha.b { background: color-mix(in srgb, var(--colorFondo) 10%, transparent); border-radius: 41% 59% 37% 63% / 58% 41% 59% 42%; }
+      [data-direccion="cercano"] #ganchoRaya { display: none; }
+      [data-direccion="cercano"] .tel { background: var(--colorFondo); border-radius: 76px; padding: 18px; box-shadow: 0 30px 70px -20px color-mix(in srgb, var(--colorFondo) 55%, transparent); }
+      [data-direccion="cercano"] .tel .pantalla { border-radius: 58px; }
+      [data-direccion="cercano"] .tarjeta { border-radius: 26px; box-shadow: 0 8px 0 color-mix(in srgb, var(--colorFondo) 14%, transparent); }
+      [data-direccion="cercano"] .tarjeta small { font-family: "Caveat", cursive; font-weight: 700; font-size: 36px; opacity: 1; color: var(--colorFondo); }
+      [data-direccion="cercano"] .tarjeta strong { font-family: "Fredoka", sans-serif; font-weight: 600; }
+      [data-direccion="cercano"] #kicker { background: #fff; color: var(--colorFondo); font-family: "Fredoka", sans-serif; text-transform: none; letter-spacing: 0; font-size: 28px; box-shadow: 0 6px 0 color-mix(in srgb, var(--colorFondo) 14%, transparent); }
+      [data-direccion="cercano"] #kicker b { display: none; }
+      [data-direccion="cercano"] #boton { font-family: "Fredoka", sans-serif; font-weight: 600; box-shadow: 0 10px 0 color-mix(in srgb, var(--colorAcento) 70%, #000); overflow: visible; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-formato="horizontal" data-composition-id="main" data-start="0" data-duration="14" data-width="1920" data-height="1080">
+      <!-- 1. Gancho (hasta que termina la transición) -->
+      <section id="sGancho" class="clip escena" data-start="0" data-duration="3" data-track-index="1">
+        <div class="marco">
+          <div class="deco" data-deco="gancho"></div>
+          <div class="sacudida" id="sacG">
+            <div class="cam" id="camG">
+              <div class="tel" id="ganchoTel"><div class="pantalla"><img src="{{img:pantalla1}}" alt="" /></div></div>
+              <div id="ganchoCaja">
+                <div id="escribiendo"><i></i><i></i><i></i></div>
+                <div id="burbuja">
+                  <div id="ganchoTxt" class="tit" data-ajustar data-caja="#ganchoCaja"><span class="linea l1"></span><span class="linea l2"></span></div>
+                </div>
+                <span id="ganchoRaya"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Tres beneficios con la cámara alrededor del teléfono -->
+      <section id="sBen" class="clip escena" data-start="2.23" data-duration="7.97" data-track-index="2">
+        <div class="marco">
+          <div class="deco" data-deco="ben"></div>
+          <div class="sacudida" id="sacB">
+            <div class="barra"><img class="logo" id="logoBen" src="{{img:logoClaro}}" alt="" /></div>
+            <div class="copia">
+              <div id="kicker"><b></b><span id="kickerTxt"></span></div>
+              <div id="titulos"><h2 class="tit" id="t1"></h2><h2 class="tit" id="t2"></h2><h2 class="tit" id="t3"></h2></div>
+              <div id="indice"><div id="indiceNum"><span>01</span><span>02</span><span>03</span></div><div id="indiceRaya"></div><span>03</span></div>
+            </div>
+            <div class="escenario">
+              <div id="mundo">
+                <div class="tel" id="tel">
+                  <div class="pantalla">
+                    <img id="p1" src="{{img:pantalla1}}" alt="" />
+                    <img id="p2" src="{{img:pantalla2}}" alt="" />
+                    <img id="p3" src="{{img:pantalla3}}" alt="" />
+                  </div>
+                </div>
+                <div class="tarjeta" id="tj1"></div>
+                <div class="tarjeta" id="tj2"></div>
+                <div class="tarjeta" id="tj3"></div>
+              </div>
+            </div>
+            <!-- capas de los beneficios que no usan el teléfono (captura grande, cifra, tipografía); las arma el JS -->
+            <div id="capas"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Cierre -->
+      <section id="sCierre" class="clip escena" data-start="9.43" data-duration="4.57" data-track-index="3">
+        <div class="marco">
+          <div class="deco" data-deco="cierre"></div>
+          <div class="sacudida" id="sacC">
+            <div class="cam" id="camC">
+              <div class="tel" id="cierreTel"><div class="pantalla"><img id="cierrePant" src="{{img:pantalla1}}" alt="" /></div></div>
+              <div id="cierreCol">
+                <img class="logo" id="cierreLogo" src="{{img:logo}}" alt="" />
+                <h2 class="tit" id="eslogan" data-ajustar data-caja="#cierreCol"></h2>
+                <div id="ctaFila">
+                  <div id="boton"><span id="ctaTxt"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg><i id="onda"></i></div>
+                  <div id="tienda">
+                    <img id="insignia" src="{{img:insignia}}" alt="" />
+                    <div id="insigniaWeb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5" /><path d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5c-2.6-2.8-3.9-6-3.9-9.5s1.3-6.7 3.9-9.5z" /></svg><div><small id="web1"></small><b id="web2"></b></div></div>
+                  </div>
+                </div>
+                <span id="url"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transiciones: capa encima de todo durante todo el anuncio -->
+      <section id="sTrans" class="clip escena" data-start="0" data-duration="14" data-track-index="4">
+        <div id="trBarras"></div>
+        <div id="trPagina"></div>
+        <div id="trLuz"></div>
+        <div id="flash"></div>
+      </section>
+
+      <!-- AUDIO: anunciar.mjs inserta aquí la voz, la música y los efectos de sonido -->
+    </div>
+
+    <script>
+      // El script anunciar.mjs reemplaza este objeto con los datos de la marca
+      const D = "__DATOS__";
+      const root = $("root");
+      for (const [k, val] of Object.entries(D.colores)) root.style.setProperty("--" + k, val);
+      root.style.setProperty("--ar-tel", proporcionTelefono(D.proporcion));
+      const DIR = D.direccion || "clasica";
+      root.dataset.direccion = DIR;
+      const FORMATO = root.dataset.formato;
+      const T = D.textos;
+
+      // Tiempos fijos (los mismos de la voz en plantilla.json y de los efectos de sonido)
+      const T1 = 2.55; // gancho → beneficios
+      const B = [2.55, 4.95, 7.35]; // inicio de cada beneficio
+      const T2 = 9.75; // beneficios → cierre
+      const IMPACTO = 1.15; // la línea clave del gancho cae aquí
+      const PERSPECTIVA = 2200;
+
+      // Cómo se mueve cada dirección: entradas, fuerza del golpe, sacudida, destello, transición y cámara
+      const PERFILES = {
+        clasica: { entrada: "golpe", golpe: 1.8, giro: 3, sacudida: 10, flash: 0.55, trans: "zoom", titulos: ["golpe", "lado", "subida"], zoom: 420, camEase: "power3.inOut", poses: [{ ry: -20, rx: 6, rz: 0 }, { ry: 14, rx: 4, rz: 0 }, { ry: -10, rx: 10, rz: 0 }] },
+        poster: { entrada: "golpe", golpe: 2.4, giro: 6, sacudida: 20, flash: 0.9, trans: "zoom", titulos: ["golpe", "lado", "giro"], zoom: 520, camEase: "expo.inOut", poses: [{ ry: -26, rx: 8, rz: -4 }, { ry: 22, rx: 4, rz: 4 }, { ry: -14, rx: 14, rz: -2 }] },
+        datos: { entrada: "mascara", golpe: 1, giro: 0, sacudida: 6, flash: 0, trans: "barras", titulos: ["mascara", "lado", "mascara"], zoom: 440, camEase: "expo.inOut", poses: [{ ry: -10, rx: 0, rz: 0 }, { ry: 10, rx: 0, rz: 0 }, { ry: 0, rx: 8, rz: 0 }] },
+        nocturno: { entrada: "desenfoque", golpe: 1.45, giro: 0, sacudida: 8, flash: 0.45, trans: "luz", titulos: ["desenfoque", "subida", "desenfoque"], zoom: 480, camEase: "power3.inOut", poses: [{ ry: -28, rx: 8, rz: 0 }, { ry: 20, rx: 6, rz: 0 }, { ry: -8, rx: 14, rz: 0 }] },
+        editorial: { entrada: "subida", golpe: 1, giro: 0, sacudida: 0, flash: 0, trans: "pagina", titulos: ["subida", "mascara", "subida"], zoom: 380, camEase: "power2.inOut", poses: [{ ry: -12, rx: 3, rz: 0 }, { ry: -4, rx: 2, rz: 0 }, { ry: -14, rx: 5, rz: 0 }] },
+        cercano: { entrada: "rebote", golpe: 1, giro: 7, sacudida: 7, flash: 0, trans: "iris", titulos: ["rebote", "lado", "rebote"], zoom: 420, camEase: "back.inOut(1.3)", poses: [{ ry: -16, rx: 4, rz: -4 }, { ry: 14, rx: 4, rz: 4 }, { ry: -6, rx: 6, rz: -2 }] },
+      };
+      const P = PERFILES[DIR] || PERFILES.clasica;
+      // transiciones posibles para el corte al cierre (la del gancho es siempre la de la dirección)
+      const TRANS2 = { clasica: ["zoom", "barras"], poster: ["zoom", "barras"], datos: ["barras", "pagina"], nocturno: ["luz", "zoom"], editorial: ["pagina", "zoom"], cercano: ["iris", "zoom"] };
+
+      // ---------- Variante: cada video de la marca muestra algo distinto ----------
+      // Generador con semilla (nada de Math.random: el render tiene que dar siempre lo mismo). La variante
+      // por defecto es el número de versión, así cada versión nueva cambia de tomas, orden y movimientos.
+      function azar(semilla) {
+        let a = semilla >>> 0;
+        return () => {
+          a = (a + 0x6d2b79f5) >>> 0;
+          let t = Math.imul(a ^ (a >>> 15), a | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const r = azar((D.variante || 1) * 7919 + [...DIR].reduce((s, c) => s * 31 + c.charCodeAt(0), 7));
+      const elegir = (lista) => lista[Math.floor(r() * lista.length)];
+      const barajar = (lista) => lista.map((x) => [r(), x]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+      const V = (() => {
+        const conCifra = (i) => /\d/.test(T["chip" + (i + 1) + "Valor"] || "");
+        // toma de cada beneficio: el teléfono con la cámara, la captura en grande, la cifra contando o solo tipografía
+        let tomas = [0, 1, 2].map(() => elegir(["telefono", "telefono", "pantalla", "cifra", "tipo"]));
+        if (!tomas.includes("telefono")) tomas[Math.floor(r() * 3)] = "telefono"; // la app se ve en el teléfono al menos una vez
+        if (tomas.every((tm) => tm === "telefono")) tomas[Math.floor(r() * 3)] = elegir(["pantalla", "cifra", "tipo"]); // y al menos una toma distinta
+        tomas = tomas.map((tm, i) => (tm === "cifra" && !conCifra(i) ? "tipo" : tm));
+        tomas = tomas.map((tm, i) => (i && tm !== "telefono" && tm === tomas[i - 1] ? "telefono" : tm)); // sin dos iguales seguidas
+        return {
+          tomas,
+          orden: barajar([1, 2, 3]), // qué captura sale en cada beneficio
+          espejo: FORMATO === "horizontal" && r() < 0.5, // teléfono a la izquierda
+          signo: r() < 0.5 ? -1 : 1, // hacia dónde gira la cámara
+          fuerza: 0.8 + r() * 0.4,
+          titulos: barajar([...P.titulos]),
+          trans2: elegir(TRANS2[DIR] || TRANS2.clasica),
+          cierre: FORMATO === "horizontal" && r() < 0.5 ? "lado" : "centro",
+          gancho: elegir(DIR === "cercano" ? ["chat", "chat", "golpe", "demo"] : ["golpe", "golpe", "demo"]),
+        };
+      })();
+      const pantalla = (i) => D.archivos["pantalla" + V.orden[i]] || D.archivos.pantalla1;
+
+      const TIPO = D.gancho || V.gancho;
+      $("sGancho").dataset.tipo = TIPO;
+      // en vertical y 4:5 el teléfono va abajo: menos giro para que no se salga del cuadro
+      const factorGiro = FORMATO === "horizontal" ? 1 : 0.6;
+
+      // ---------- Decoración de fondo de cada dirección ----------
+      const DECO = {
+        poster: { gancho: `<span class="marcaAgua" data-layout-allow-overflow>${esc(T.nombre)}</span>` },
+        datos: { gancho: '<div class="reticula"></div>', ben: '<div class="reticula"></div><div class="meta"><span id="metaIzq"></span><span id="metaDer"></span></div>', cierre: '<div class="reticula"></div>' },
+        nocturno: {
+          gancho: '<div class="luz" style="left:20%;bottom:-60%;width:60%;height:90%"></div><div class="grano"></div>',
+          ben: '<div class="luz" style="right:-10%;top:-20%;width:70%;height:110%"></div><div class="grano"></div>',
+          cierre: '<div class="luz" style="left:25%;top:20%;width:50%;height:70%"></div><div class="grano"></div>',
+        },
+        editorial: { gancho: '<div class="filetes"></div>', ben: '<div class="filetes"></div>' },
+        cercano: {
+          gancho: '<div class="mancha" style="right:-8%;top:-14%;width:42%;height:62%"></div><div class="mancha b" style="left:-10%;bottom:-24%;width:44%;height:60%"></div>',
+          ben: '<div class="mancha" style="right:6%;top:10%;width:40%;height:72%"></div>',
+          cierre: '<div class="mancha" style="left:30%;top:10%;width:40%;height:80%"></div>',
+        },
+      };
+      document.querySelectorAll("[data-deco]").forEach((el) => (el.innerHTML = DECO[DIR]?.[el.dataset.deco] || ""));
+      if ($("metaIzq")) { $("metaIzq").textContent = T.nombre || ""; $("metaDer").textContent = T.url || ""; }
+
+      // ---------- Textos ----------
+      function enPalabras(el, texto, resaltada) {
+        el.innerHTML = "";
+        String(texto || "").split(/\s+/).filter(Boolean).forEach((p, i) => {
+          if (i) el.appendChild(document.createTextNode(" "));
+          const w = document.createElement("span");
+          w.className = "w";
+          const wi = document.createElement("span");
+          wi.className = "wi" + (resaltada ? " resaltado" : "");
+          wi.textContent = p;
+          w.appendChild(wi);
+          el.appendChild(w);
+        });
+      }
+      enPalabras(document.querySelector("#ganchoTxt .l1"), T.hookLinea1);
+      enPalabras(document.querySelector("#ganchoTxt .l2"), T.hookLinea2, true);
+      $("kickerTxt").textContent = T.kicker || "";
+      if (!T.kicker) $("kicker").style.display = "none";
+      [1, 2, 3].forEach((n) => {
+        $("t" + n).textContent = T["titulo" + n] || "";
+        const et = T["chip" + n + "Etiqueta"], va = T["chip" + n + "Valor"];
+        if (et || va) $("tj" + n).innerHTML = `<div class="ico">${ICONOS.check}</div><div><small>${esc(et)}</small><strong class="tjv">${esc(va)}</strong></div>`;
+        else $("tj" + n).remove();
+      });
+      enPalabras($("eslogan"), T.eslogan);
+      // la última palabra del eslogan en color, para que el cierre retome el acento
+      const ultima = $("eslogan").querySelectorAll(".wi");
+      if (ultima.length > 1) ultima[ultima.length - 1].classList.add("resaltado");
+      $("ctaTxt").textContent = T.cta || "";
+      $("url").textContent = T.url || "";
+      if (T.webLinea1 || T.webLinea2) { $("web1").textContent = T.webLinea1 || ""; $("web2").textContent = T.webLinea2 || ""; }
+      else $("insigniaWeb").remove();
+      if (!D.archivos.insignia) $("insignia").remove();
+      // fondos claros llevan el logo para fondo claro; los oscuros, el normal (se deduce del color del texto)
+      const fondoClaro = (sel) => { const c = getComputedStyle(document.querySelector(sel)).color.match(/\d+/g).map(Number); return c[0] + c[1] + c[2] < 384; };
+      $("logoBen").src = fondoClaro("#sBen .marco") ? D.archivos.logoClaro : D.archivos.logo;
+      // en póster el logo del cierre va sobre una placa blanca
+      $("cierreLogo").src = DIR === "poster" || fondoClaro("#sCierre .marco") ? D.archivos.logoClaro : D.archivos.logo;
+      // capturas según la variante: cada beneficio la suya; el gancho demo y el cierre, la del primero
+      [1, 2, 3].forEach((n) => ($("p" + n).src = pantalla(n - 1)));
+      document.querySelector("#ganchoTel img").src = pantalla(0);
+      $("cierrePant").src = pantalla(0);
+
+      // Tomas sin teléfono: se arman antes de medir para que sus textos también se ajusten
+      const tarjetaHtml = (n) => {
+        const et = T["chip" + n + "Etiqueta"], va = T["chip" + n + "Valor"];
+        return et || va ? `<div class="tarjeta"><div class="ico">${ICONOS.check}</div><div><small>${esc(et)}</small><strong class="tjv">${esc(va)}</strong></div></div>` : "";
+      };
+      V.tomas.forEach((toma, i) => {
+        const n = i + 1;
+        const capa = document.createElement("div");
+        capa.className = "capa";
+        capa.id = "capa" + n;
+        if (toma === "pantalla") capa.innerHTML = `<div class="lamina"><img src="${pantalla(i)}" alt="" /></div>${tarjetaHtml(n)}`;
+        else if (toma === "cifra")
+          capa.innerHTML = `<div class="cifra"><span class="etq">${esc(T["chip" + n + "Etiqueta"])}</span><span class="num tit" data-ajustar data-caja=".cifra">${esc(T["chip" + n + "Valor"])}</span><i class="raya"></i><h2 class="tit tit-c">${esc(T["titulo" + n])}</h2></div>`;
+        else if (toma === "tipo") capa.innerHTML = `<div class="tipo"><h2 class="tit tit-t" data-ajustar data-caja=".tipo"></h2>${tarjetaHtml(n)}</div>`;
+        else return;
+        $("capas").appendChild(capa);
+        if (toma === "tipo") enPalabras(capa.querySelector(".tit-t"), T["titulo" + n]);
+        if (toma === "cifra" && ["nocturno", "cercano", "editorial"].includes(DIR)) capa.querySelector(".num").classList.add("resaltado");
+      });
+
+      // Si el valor de una tarjeta lleva un número, se anima contando
+      function contador(el) {
+        const texto = el.textContent;
+        const m = texto.match(/^(\D*)([\d.,]+)(.*)$/);
+        if (!m) return null;
+        const sep = m[2].includes(".") ? "." : m[2].includes(",") ? "," : "";
+        const fin = parseInt(m[2].replace(/[.,]/g, ""), 10);
+        const fmt = (n) => (sep ? String(n).replace(/\B(?=(\d{3})+(?!\d))/g, sep) : String(n));
+        const o = { n: 0 };
+        return { o, fin, pintar: () => (el.textContent = m[1] + fmt(Math.round(o.n)) + m[3]) };
+      }
+
+      // ---------- Línea de tiempo ----------
+      const tl = gsap.timeline({ paused: true });
+
+      // sacudida determinista (sin azar): decae en 5 pasos
+      function sacudir(sel, t, fuerza) {
+        if (!fuerza) return;
+        const pasos = [[-1, 0.6, -0.5], [0.8, -0.55, 0.4], [-0.5, 0.35, -0.25], [0.25, -0.15, 0.1], [0, 0, 0]];
+        pasos.forEach(([x, y, r], i) =>
+          tl.to(sel, { x: x * fuerza, y: y * fuerza, rotation: r * fuerza * 0.08, duration: 0.045, ease: "none", immediateRender: false }, t + i * 0.045),
+        );
+      }
+      function destello(t, fuerza) {
+        if (!fuerza) return;
+        tl.fromTo("#flash", { opacity: fuerza }, { opacity: 0, duration: 0.3, ease: "power2.out", immediateRender: false }, t);
+      }
+
+      // Entrada de una palabra o un bloque según la dirección; la primera del gancho ya se ve en el fotograma 0
+      function entrar(el, t, tipo, i = 0, primera = false) {
+        const a0 = primera ? 1 : 0;
+        const giro = (i % 2 ? 1 : -1) * P.giro;
+        const V = {
+          golpe: [{ scale: P.golpe, rotation: giro, opacity: a0, filter: "blur(10px)" }, { scale: 1, rotation: 0, opacity: 1, filter: "blur(0px)", duration: 0.34, ease: "power4.out" }],
+          lado: [{ x: (i % 2 ? 1 : -1) * 420, skewX: (i % 2 ? -1 : 1) * 12, opacity: a0 }, { x: 0, skewX: 0, opacity: 1, duration: 0.42, ease: "expo.out" }],
+          giro: [{ y: 120, rotation: 9, opacity: a0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.5, ease: "circ.out" }],
+          mascara: [{ clipPath: "inset(0% 100% 0% 0%)", x: -30, opacity: 1 }, { clipPath: "inset(0% 0% 0% 0%)", x: 0, opacity: 1, duration: 0.38, ease: "expo.out" }],
+          desenfoque: [{ scale: 1.35, opacity: a0, filter: "blur(18px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: "power3.out" }],
+          subida: [{ yPercent: 110, opacity: a0, clipPath: "inset(-20% -10% 100% -10%)" }, { yPercent: 0, opacity: 1, clipPath: "inset(-20% -10% -20% -10%)", duration: 0.6, ease: "expo.out" }],
+          rebote: [{ scale: 0, rotation: giro, opacity: 1 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(2.6)" }],
+        }[tipo];
+        // la primera palabra ya se lee en el fotograma 0: entra desde un estado más cercano al final
+        if (primera && tipo === "golpe") Object.assign(V[0], { scale: Math.min(P.golpe, 1.45), filter: "blur(5px)", transformOrigin: "0% 60%" });
+        if (primera && tipo === "mascara") V[0].clipPath = "inset(0% 40% 0% 0%)";
+        if (primera && tipo === "rebote") V[0].scale = 0.5;
+        if (primera && tipo === "subida") Object.assign(V[0], { yPercent: 40, clipPath: "inset(-20% -10% 25% -10%)" });
+        if (primera && tipo === "desenfoque") Object.assign(V[0], { scale: 1.15, filter: "blur(8px)" });
+        tl.fromTo(el, V[0], { ...V[1] }, t);
+      }
+
+      // ===== 1. Gancho =====
+      function gancho() {
+        const l1 = [...document.querySelectorAll("#ganchoTxt .l1 .wi")];
+        const l2 = [...document.querySelectorAll("#ganchoTxt .l2 .wi")];
+        const inicio = TIPO === "demo" ? 0.35 : TIPO === "chat" ? 0.45 : 0;
+        const d1 = l1.length ? Math.min(0.17, (0.7 - inicio) / l1.length) : 0;
+        l1.forEach((w, i) => entrar(w, inicio + i * d1, P.entrada, i, i === 0 && inicio === 0));
+        // la línea clave: palabras más seguidas y el golpe al final
+        const d2 = l2.length ? Math.min(0.12, 0.3 / l2.length) : 0;
+        l2.forEach((w, i) => entrar(w, IMPACTO - 0.32 + i * d2, P.entrada, i + 1));
+        tl.fromTo("#ganchoTxt .l2", { scale: 1 }, { scale: 1.06, duration: 0.08, ease: "power2.out", yoyo: true, repeat: 1, transformOrigin: "left center" }, IMPACTO);
+        sacudir("#sacG", IMPACTO, P.sacudida);
+        destello(IMPACTO, P.flash * 0.7);
+        tl.fromTo("#ganchoRaya", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, IMPACTO + 0.05);
+
+        if (TIPO === "demo") {
+          // demo en frío: la cámara arranca pegada a la app y se aleja girando
+          gsap.set("#ganchoTel", { transformPerspective: PERSPECTIVA });
+          const destino = FORMATO === "horizontal" ? { x: 430, y: 0 } : { x: 0, y: 380 };
+          tl.fromTo("#ganchoTel", { scale: 2.3, rotationY: 0, rotationX: 0, x: 0, y: 260 }, { scale: 0.92, rotationY: -22 * factorGiro, rotationX: 8, ...destino, duration: 1.3, ease: "power3.inOut" }, 0);
+        } else if (TIPO === "chat") {
+          tl.fromTo("#escribiendo i", { y: 0 }, { y: -14, duration: 0.14, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.08 }, 0);
+          tl.fromTo("#escribiendo", { scale: 1, opacity: 1 }, { scale: 0.4, opacity: 0, duration: 0.2, ease: "power2.in" }, 0.32);
+          tl.fromTo("#burbuja", { scale: 0.3, opacity: 0, transformOrigin: "left bottom" }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }, 0.35);
+          tl.fromTo("#burbuja", { y: 0 }, { y: -10, duration: 0.1, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, IMPACTO);
+        }
+        // empuje lento de cámara mientras el gancho se sostiene
+        tl.fromTo("#camG", { scale: 1 }, { scale: 1.05, duration: T1, ease: "sine.inOut" }, 0);
+      }
+
+      // ===== 2. Beneficios: cámara 3D alrededor del teléfono =====
+      const mundo = $("mundo");
+      const cam = { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0 };
+      const aplicar = () => (mundo.style.transform = `translate3d(${cam.x}px, ${cam.y}px, ${cam.z}px) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg) rotateZ(${cam.rz}deg)`);
+      // Muestra u oculta un bloque según la toma de cada beneficio (cambia justo antes de cada uno)
+      function visibilidad(sel, visible) {
+        gsap.set(sel, { opacity: visible[0] ? 1 : 0 });
+        visible.forEach((v, i) => {
+          if (i && v !== visible[i - 1]) tl.fromTo(sel, { opacity: v ? 0 : 1 }, { opacity: v ? 1 : 0, duration: 0.2, ease: "power2.inOut", immediateRender: false }, B[i] - 0.2);
+        });
+      }
+
+      // La tarjeta salta (con contador si su valor lleva número)
+      function tarjeta(el, t, z) {
+        if (!el) return;
+        tl.fromTo(el, { scale: 0.3, opacity: 0, rotation: P.giro * 1.5, z }, { scale: 1, opacity: 1, rotation: 0, z, duration: 0.55, ease: "back.out(2)" }, t);
+        const c = contador(el.querySelector(".tjv"));
+        if (c) { c.pintar(); tl.to(c.o, { n: c.fin, duration: 0.9, ease: "power2.out", onUpdate: c.pintar }, t + 0.05); }
+      }
+
+      function beneficios() {
+        // del CSS y no del DOM: la escena puede no estar dibujada todavía
+        const telH = parseFloat(getComputedStyle(root).getPropertyValue("--tel-h"));
+        const foco = D.foco || [0.28, 0.28, 0.28]; // altura del detalle a acercar (0 arriba, 1 abajo)
+        $("sBen").dataset.espejo = V.espejo ? "1" : "0";
+        const giro = (i) => ({ rx: P.poses[i].rx * V.fuerza * factorGiro, ry: P.poses[i].ry * V.signo * V.fuerza * factorGiro, rz: P.poses[i].rz * V.signo * factorGiro });
+        const pose = (i) => ({ x: 0, y: 0, z: 0, ...giro(i) });
+        const acercar = (i) => {
+          const s = PERSPECTIVA / (PERSPECTIVA - P.zoom);
+          return { x: 0, y: (0.5 - foco[i]) * telH * s, z: P.zoom, rx: giro(i).rx * 0.25, ry: giro(i).ry * 0.3, rz: 0 };
+        };
+        // el teléfono llega volando y girando (también si vuelve después de una toma sin teléfono)
+        const ENTRADA = { x: 0, y: FORMATO === "horizontal" ? 900 : 1100, z: -600, rx: 40, ry: -40 * V.signo * factorGiro, rz: P.giro * 2 * V.signo };
+        const conCopia = (tm) => tm === "telefono" || tm === "pantalla";
+        visibilidad(".copia", V.tomas.map(conCopia));
+        visibilidad(".escenario", V.tomas.map((tm) => tm === "telefono"));
+        let camLista = false;
+        B.forEach((t, i) => {
+          const n = i + 1;
+          const toma = V.tomas[i];
+          const fin = B[i + 1] || T2;
+          const ultima = i === 2; // la última la saca la transición al cierre
+
+          // título al lado (teléfono y captura grande); los que no se usan quedan ocultos
+          if (conCopia(toma)) {
+            entrar("#t" + n, t + 0.05, V.titulos[i], i);
+            if (V.titulos[i] === "golpe") sacudir("#sacB", t + 0.12, P.sacudida * 0.5);
+            // sale siempre (aunque la toma siguiente oculte la columna, puede volver a mostrarse después)
+            if (!ultima) tl.to("#t" + n, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, fin - 0.2);
+          } else gsap.set("#t" + n, { opacity: 0 });
+          tl.fromTo("#indiceNum span", { yPercent: -100 * Math.max(0, i - 1) }, { yPercent: -100 * i, duration: 0.4, ease: "power3.out", immediateRender: !i }, t);
+
+          if (toma === "telefono") {
+            // cámara: llega a la pose del beneficio y a mitad se acerca al detalle
+            const seguido = i && V.tomas[i - 1] === "telefono";
+            const desde = seguido ? acercar(i - 1) : ENTRADA;
+            tl.fromTo(cam, { ...desde }, { ...pose(i), duration: seguido ? 0.7 : 0.85, ease: seguido ? P.camEase : "power4.out", onUpdate: aplicar, immediateRender: !camLista }, t - (seguido ? 0.2 : 0.25));
+            camLista = true;
+            tl.fromTo(cam, { ...pose(i) }, { ...acercar(i), duration: 0.55, ease: "power3.inOut", onUpdate: aplicar, immediateRender: false }, t + 1.2);
+            // la captura de este beneficio sube; la anterior se va con paralaje
+            tl.fromTo("#p" + n, { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "power4.inOut" }, t - 0.2);
+            if (seguido) tl.fromTo("#p" + i, { yPercent: 0 }, { yPercent: -30, duration: 0.6, ease: "power4.inOut", immediateRender: false }, t - 0.2);
+            // z: la tarjeta flota delante del teléfono (va en GSAP, no en CSS, para no pisar el transform)
+            tarjeta($("tj" + n), t + 0.45, 140);
+            if ($("tj" + n) && !ultima) tl.to("#tj" + n, { opacity: 0, scale: 0.85, duration: 0.2, ease: "power2.in" }, fin - 0.2);
+          } else {
+            if ($("tj" + n)) gsap.set("#tj" + n, { opacity: 0 });
+            gsap.set("#p" + n, { yPercent: 100 });
+            const capa = "#capa" + n;
+            tl.fromTo(capa, { opacity: 0 }, { opacity: 1, duration: 0.01 }, t - 0.2);
+            if (!ultima) tl.to(capa, { opacity: 0, duration: 0.2, ease: "power2.in" }, fin - 0.2);
+
+            if (toma === "pantalla") {
+              // la captura en grande entra girando y se recorre hacia el detalle (foco)
+              tl.fromTo(capa + " .lamina", { y: 600, rotation: 8 * V.signo, scale: 0.9 }, { y: 0, rotation: -2 * V.signo, scale: 1, duration: 0.75, ease: "power4.out" }, t - 0.2);
+              tl.fromTo(capa + " .lamina img", { yPercent: 0, scale: 1 }, { yPercent: -foco[i] * 55, scale: 1.1, duration: fin - t + 0.2, ease: "sine.inOut", transformOrigin: "50% 0%" }, t - 0.2);
+              tarjeta(document.querySelector(capa + " .tarjeta"), t + 0.45, 0);
+            } else if (toma === "cifra") {
+              // la cifra cae con golpe y cuenta; la etiqueta, la raya y el beneficio llegan después
+              const num = capa + " .num";
+              tl.fromTo(num, { scale: Math.max(P.golpe, 1.5), opacity: 0, filter: "blur(12px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "power4.out" }, t);
+              sacudir("#sacB", t + 0.35, Math.max(P.sacudida, 6) * 0.6);
+              destello(t + 0.3, P.flash * 0.5);
+              const c = contador(document.querySelector(num));
+              if (c) { c.pintar(); tl.to(c.o, { n: c.fin, duration: 1.0, ease: "power2.out", onUpdate: c.pintar }, t); }
+              entrar(capa + " .etq", t + 0.1, "subida", i);
+              tl.fromTo(capa + " .raya", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.out" }, t + 0.35);
+              entrar(capa + " .tit-c", t + 0.5, V.titulos[i], i);
+            } else {
+              // solo tipografía: el beneficio palabra por palabra, a pantalla completa
+              const palabras = [...document.querySelectorAll(capa + " .wi")];
+              palabras.forEach((w, k) => entrar(w, t + k * Math.min(0.1, 0.5 / palabras.length), P.entrada, k));
+              sacudir("#sacB", t + 0.55, P.sacudida * 0.6);
+              tarjeta(document.querySelector(capa + " .tarjeta"), t + 0.85, 0);
+            }
+          }
+        });
+        tl.fromTo("#kicker", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.8)" }, B[0]);
+        tl.fromTo(".barra", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, B[0] + 0.1);
+        aplicar();
+      }
+
+      // ===== 3. Cierre =====
+      function cierre() {
+        const t = T2;
+        // en horizontal, según la variante, el cierre va centrado o con el teléfono al lado
+        $("sCierre").dataset.tipo = V.cierre;
+        if (V.cierre === "lado") {
+          gsap.set("#cierreTel", { transformPerspective: PERSPECTIVA });
+          tl.fromTo("#cierreTel", { y: 800, rotation: 14 * V.signo, rotationY: -30 * V.signo }, { y: 0, rotation: -5 * V.signo, rotationY: -14 * V.signo, duration: 0.9, ease: "power4.out" }, t + 0.45);
+        }
+        const logoDesde = P.entrada === "golpe" ? { scale: P.golpe, opacity: 0, filter: "blur(12px)" } : P.entrada === "rebote" ? { scale: 0, opacity: 1 } : { y: 40, opacity: 0 };
+        tl.fromTo("#cierreLogo", logoDesde, { scale: 1, y: 0, opacity: 1, filter: "blur(0px)", duration: 0.5, ease: P.entrada === "rebote" ? "back.out(2.4)" : "power4.out" }, t + 0.3);
+        sacudir("#sacC", t + 0.4, P.sacudida * 0.7);
+        destello(t + 0.38, P.flash * 0.6);
+        [...document.querySelectorAll("#eslogan .wi")].forEach((w, i) => entrar(w, t + 0.65 + i * 0.09, P.entrada, i));
+        tl.fromTo("#boton", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2.2)" }, t + 1.3);
+        tl.fromTo("#tienda", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, t + 1.5);
+        tl.fromTo("#url", { opacity: 0 }, { opacity: 0.75, duration: 0.5, ease: "sine.out" }, t + 1.7);
+        // el botón se presiona: hunde, rebota y deja una onda
+        tl.to("#boton", { scale: 0.9, duration: 0.09, ease: "power2.in" }, t + 2.4);
+        tl.to("#boton", { scale: 1, duration: 0.45, ease: "back.out(3)" }, t + 2.49);
+        tl.fromTo("#onda", { scale: 0, opacity: 0.8 }, { scale: 6, opacity: 0, duration: 0.6, ease: "power2.out" }, t + 2.45);
+        tl.fromTo("#camC", { scale: 1 }, { scale: 1.04, duration: 14 - t, ease: "sine.inOut" }, t);
+      }
+
+      // ===== Transiciones (la escena nueva aparece justo en el corte) =====
+      // (las capas de transición se reutilizan: su estado inicial se fija una vez al construir, por eso aquí
+      // todo va con immediateRender: false salvo el .marco de la escena que entra, que es propio de cada corte)
+      function transicion(t, sale, entra, tipo) {
+        // la escena que entra queda oculta hasta el corte
+        tl.fromTo(entra + " .marco", { opacity: 0 }, { opacity: 1, duration: 0.01 }, tipo === "iris" ? t - 0.06 : t);
+        if (tipo === "zoom") {
+          tl.fromTo(sale + " .marco", { scale: 1, filter: "blur(0px)" }, { scale: 1.5, filter: "blur(14px)", duration: 0.24, ease: "power3.in", immediateRender: false }, t - 0.22);
+          tl.fromTo(entra + " .marco", { scale: 0.78, filter: "blur(14px)" }, { scale: 1, filter: "blur(0px)", duration: 0.38, ease: "power3.out", immediateRender: false }, t);
+          destello(t - 0.02, 0.9);
+        } else if (tipo === "barras") {
+          const barras = "#trBarras .tr-barra";
+          tl.fromTo(barras, { scaleY: 0, transformOrigin: "bottom center" }, { scaleY: 1, duration: 0.24, ease: "power3.in", stagger: 0.03, immediateRender: false }, t - 0.39);
+          tl.fromTo(barras, { scaleY: 1, transformOrigin: "top center" }, { scaleY: 0, duration: 0.28, ease: "power3.out", stagger: 0.03, immediateRender: false }, t + 0.02);
+        } else if (tipo === "luz") {
+          tl.fromTo(sale + " .marco", { filter: "blur(0px) brightness(1)" }, { filter: "blur(16px) brightness(1.8)", duration: 0.26, ease: "power2.in", immediateRender: false }, t - 0.26);
+          tl.fromTo("#trLuz", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1.2, duration: 0.26, ease: "power2.in", immediateRender: false }, t - 0.26);
+          tl.fromTo("#trLuz", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power2.out", immediateRender: false }, t);
+          tl.fromTo(entra + " .marco", { filter: "blur(20px) brightness(1.6)" }, { filter: "blur(0px) brightness(1)", duration: 0.45, ease: "power3.out", immediateRender: false }, t);
+        } else if (tipo === "pagina") {
+          tl.fromTo("#trPagina", { yPercent: 100 }, { yPercent: 0, duration: 0.32, ease: "power3.in", immediateRender: false }, t - 0.32);
+          tl.fromTo("#trPagina", { yPercent: 0 }, { yPercent: -100, duration: 0.4, ease: "power3.out", immediateRender: false }, t + 0.02);
+          tl.fromTo(entra + " .marco", { y: 60 }, { y: 0, duration: 0.5, ease: "power3.out", immediateRender: false }, t);
+        } else if (tipo === "iris") {
+          tl.fromTo(entra + " .marco", { clipPath: "circle(0% at 50% 55%)" }, { clipPath: "circle(80% at 50% 55%)", duration: 0.55, ease: "power2.out", immediateRender: false }, t - 0.06);
+          tl.fromTo(sale + " .marco", { scale: 1 }, { scale: 0.92, duration: 0.5, ease: "power2.inOut", immediateRender: false }, t - 0.1);
+        }
+      }
+
+      // Construye todo con las fuentes ya cargadas (para ajustar bien los textos) y registra la línea de tiempo
+      Promise.all([...document.fonts].map((f) => f.load().catch(() => null))).then(() => {
+        // capas de transición fuera de cuadro hasta su corte
+        if ([P.trans, V.trans2].includes("barras")) $("trBarras").innerHTML = Array.from({ length: 6 }, (_, i) => `<i class="tr-barra" style="left:calc(${i} * 100% / 6)"></i>`).join("");
+        gsap.set("#trBarras .tr-barra", { scaleY: 0 });
+        gsap.set("#trPagina", { yPercent: 100 });
+        // se mide con todas las escenas visibles, aunque el reproductor tenga ocultas las que aún no empiezan
+        const escenas = [...document.querySelectorAll(".escena")];
+        const antes = escenas.map((e) => e.style.display);
+        escenas.forEach((e) => (e.style.display = "block"));
+        for (const el of document.querySelectorAll("[data-ajustar]")) ajustar(el, el.dataset.caja ? el.closest(el.dataset.caja) : el, 0.4);
+        for (const n of [1, 2, 3]) ajustar($("t" + n), $("t" + n), 0.4);
+        // margen para el empuje de cámara y el golpe de escala del gancho, que lo agrandan un poco
+        const g = $("ganchoTxt");
+        g.style.fontSize = parseFloat(getComputedStyle(g).fontSize) * 0.9 + "px";
+        escenas.forEach((e, i) => (e.style.display = antes[i]));
+        gancho();
+        beneficios();
+        cierre();
+        transicion(T1, "#sGancho", "#sBen", P.trans);
+        transicion(T2, "#sBen", "#sCierre", V.trans2);
+      }).then(() => {
+        window.__timelines["main"] = tl;
+      });
+    </script>
+  </body>
+</html>

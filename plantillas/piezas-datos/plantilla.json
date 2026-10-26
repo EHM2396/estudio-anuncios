@@ -1,0 +1,50 @@
+{
+  "nombre": "piezas-datos",
+  "tipo": "imagenes",
+  "descripcion": "Dirección datos: estilo suizo. Retícula visible, grotesca apretada, etiquetas en mono, el teléfono en línea con anotaciones y antes/después como tabla.",
+  "direccion": {
+    "id": "datos",
+    "nombre": "Datos",
+    "sensacion": "Precisa, técnica, clara",
+    "idealPara": "Software, SaaS, B2B, herramientas, reportes y finanzas con cifras"
+  },
+  "formatos": {
+    "horizontal": {
+      "ancho": 1920,
+      "alto": 1080
+    },
+    "vertical": {
+      "ancho": 1080,
+      "alto": 1920
+    },
+    "4x5": {
+      "ancho": 1080,
+      "alto": 1350
+    }
+  },
+  "piezas": [
+    "pregunta",
+    "beneficio",
+    "numero",
+    "lista",
+    "antes-despues"
+  ],
+  "archivos": [
+    "logo",
+    "logoClaro",
+    "insignia",
+    "pantalla1",
+    "pantalla2",
+    "pantalla3"
+  ],
+  "pesosFuente": [
+    "500",
+    "600",
+    "700"
+  ],
+  "recursos": {
+    "assets/comun.js": "piezas/comun.js",
+    "assets/fuentes/SpaceGrotesk-Variable.ttf": "fuentes/SpaceGrotesk-Variable.ttf",
+    "assets/fuentes/JetBrainsMono-Variable.ttf": "fuentes/JetBrainsMono-Variable.ttf"
+  }
+}

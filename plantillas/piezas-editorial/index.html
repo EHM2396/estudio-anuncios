@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/comun.js"></script>
+    <style>
+      /* Dirección editorial: revista. Serif grande, papel, filetes finos y la app como foto con pie. */
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-500.ttf"); font-weight: 500; }
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-600.ttf"); font-weight: 600; }
+      @font-face { font-family: "Marca"; src: url("assets/marca/fuente-700.ttf"); font-weight: 700; }
+      @font-face { font-family: "Titular"; src: url("assets/fuentes/InstrumentSerif-Regular.ttf"); font-style: normal; }
+      @font-face { font-family: "Titular"; src: url("assets/fuentes/InstrumentSerif-Italic.ttf"); font-style: italic; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #f6f1e7; }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: "Marca", sans-serif;
+        --papel: color-mix(in srgb, var(--colorClaro) 35%, #f8f3e9);
+        --tinta: var(--colorFondo2);
+        --suave: color-mix(in srgb, var(--colorFondo2) 62%, var(--papel));
+        --filete: color-mix(in srgb, var(--colorFondo2) 28%, transparent);
+        --pad-y: 96px;
+        --pad-x: 120px;
+        --pad-abajo: 90px;
+        --gap: 72px;
+        --foto-w: 560px;
+      }
+      #root[data-formato="vertical"] { --pad-y: 220px; --pad-x: 80px; --pad-abajo: 320px; --gap: 56px; --foto-w: 640px; }
+      #root[data-formato="4x5"] { --pad-y: 76px; --pad-x: 72px; --pad-abajo: 70px; --gap: 40px; --foto-w: 390px; }
+
+      /* ---------- Página ---------- */
+      .pieza {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: var(--pad-y) var(--pad-x) var(--pad-abajo);
+        background: var(--papel);
+        color: var(--tinta);
+      }
+      .pieza.tinta {
+        --papel: var(--colorFondo2);
+        --tinta: #f8f3e9;
+        --suave: color-mix(in srgb, #f8f3e9 72%, var(--colorFondo2));
+        --filete: color-mix(in srgb, #f8f3e9 30%, transparent);
+        background: var(--colorFondo2);
+      }
+      .cab {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        padding-bottom: 22px;
+        border-bottom: 1.5px solid var(--tinta);
+      }
+      .logo { display: block; width: 360px; height: 70px; object-fit: contain; object-position: left center; }
+      .folio, .versalita {
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .folio { color: var(--suave); text-align: right; }
+      .cuerpo { display: grid; min-height: 0; gap: var(--gap); padding: 48px 0; }
+      .texto { display: flex; flex-direction: column; justify-content: center; min-height: 0; overflow: hidden; }
+      .titulo {
+        font-family: "Titular", serif;
+        font-weight: 400;
+        line-height: 0.98;
+        letter-spacing: -0.012em;
+        text-wrap: balance;
+      }
+      .titulo .resaltado, .italica { font-style: italic; color: var(--colorFondo); }
+      .tinta .titulo .resaltado, .tinta .italica { color: var(--colorAcento); }
+      .sub { font-size: 34px; font-weight: 500; line-height: 1.38; color: var(--suave); text-wrap: pretty; max-width: 900px; }
+      .regla { width: 120px; height: 3px; background: var(--colorAcento); margin: 40px 0 34px; flex: none; }
+
+      /* La app, como foto de revista con pie: recorte de la parte de arriba de la pantalla */
+      .foto { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 16px; min-height: 0; width: var(--foto-w); }
+      .marco {
+        min-height: 0;
+        /* nunca más angosta que la captura: si falta alto se recorta abajo, nunca a los lados */
+        height: min(100%, calc(var(--foto-w) / var(--ar-tel, 0.58)));
+        align-self: end; /* pegada a su pie de foto */
+        padding: 14px;
+        background: #fff;
+        border: 1px solid var(--filete);
+        box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.35);
+      }
+      .tinta .marco { background: #f8f3e9; border: none; }
+      .marco img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+      .pie-foto { font-size: 21px; line-height: 1.35; color: var(--suave); max-width: 460px; }
+      .pie-foto b { font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tinta); margin-right: 10px; }
+
+      /* ---------- Pie: botón rectangular, insignias con filete, URL en versalitas ---------- */
+      .pie { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-top: 28px; border-top: 1.5px solid var(--tinta); }
+      .pie-fila { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        height: 80px;
+        padding: 0 38px;
+        border-radius: 2px;
+        font-size: 30px;
+        font-weight: 600;
+        background: var(--tinta);
+        color: var(--papel);
+      }
+      .cta svg { width: 28px; height: 28px; }
+      .insignia { height: 64px; display: block; }
+      .insignia-web {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 22px 0 16px;
+        border: 1.5px solid var(--tinta);
+        border-radius: 2px;
+      }
+      .insignia-web svg { width: 34px; height: 34px; }
+      .insignia-web small { display: block; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1.1; }
+      .insignia-web b { display: block; font-size: 26px; font-weight: 600; line-height: 1.05; }
+      .url { font-size: 22px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--suave); }
+
+      /* ---------- 1. Pregunta: portada tipográfica ---------- */
+      #p-pregunta .cuerpo { grid-template-columns: 1fr; }
+      #p-pregunta .texto { justify-content: flex-end; }
+      #p-pregunta .titulo { font-size: 190px; max-width: 1560px; }
+      #p-pregunta .lomo {
+        position: absolute;
+        right: calc(var(--pad-x) * 0.42);
+        top: 50%;
+        transform: translate(50%, -50%) rotate(90deg);
+        white-space: nowrap;
+        color: var(--suave);
+      }
+
+      /* ---------- 2. Beneficio: texto + foto ---------- */
+      #p-beneficio .cuerpo { grid-template-columns: 1fr auto; }
+      #p-beneficio .titulo { font-size: 120px; margin-top: 30px; }
+      #p-beneficio .versalita { color: var(--colorFondo); }
+
+      /* ---------- 3. Número: página en tinta ---------- */
+      #p-numero .cuerpo { grid-template-columns: 1fr auto; }
+      #p-numero .versalita { color: var(--colorAcento); }
+      #p-numero .valor { font-family: "Titular", serif; font-size: 360px; line-height: 0.9; letter-spacing: -0.02em; margin: 20px 0 10px -6px; white-space: nowrap; }
+      #p-numero .sub { font-family: "Titular", serif; font-style: italic; font-size: 54px; line-height: 1.12; color: var(--tinta); max-width: 820px; }
+
+      /* ---------- 4. Lista: índice de revista ---------- */
+      #p-lista .cuerpo { grid-template-columns: 1fr auto; }
+      #p-lista .titulo { font-size: 104px; margin-bottom: 40px; }
+      #p-lista ol { list-style: none; border-top: 1px solid var(--filete); }
+      #p-lista li {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        align-items: baseline;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--filete);
+        font-family: "Titular", serif;
+        font-size: 54px;
+        line-height: 1.05;
+      }
+      #p-lista li i { font-style: italic; font-size: 40px; color: var(--colorFondo); }
+
+      /* ---------- 5. Antes / después: dos columnas con filete ---------- */
+      #p-antes .cuerpo { grid-template-columns: 1fr auto 1fr; gap: 0; }
+      #p-antes .col { display: flex; flex-direction: column; justify-content: center; gap: 34px; padding: 0 64px; min-height: 0; }
+      #p-antes .col:first-child { padding-left: 0; }
+      #p-antes .col:last-child { padding-right: 0; }
+      #p-antes .divisor { position: relative; width: 1.5px; background: var(--tinta); }
+      #p-antes .divisor span {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 104px;
+        height: 104px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        border: 1.5px solid var(--tinta);
+        background: var(--papel);
+        font-family: "Titular", serif;
+        font-style: italic;
+        font-size: 64px;
+        line-height: 1;
+      }
+      #p-antes ul { list-style: none; display: flex; flex-direction: column; gap: 0.4em; }
+      #p-antes .antes ul { font-size: 44px; }
+      #p-antes .despues ul { font-size: 80px; }
+      #p-antes .antes .versalita { color: var(--suave); }
+      #p-antes .antes li { font-weight: 500; color: var(--suave); text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: color-mix(in srgb, var(--suave) 70%, transparent); }
+      #p-antes .despues .versalita { color: var(--colorFondo); }
+      #p-antes .despues li { font-family: "Titular", serif; line-height: 1.02; }
+      #p-antes .despues li::before { content: "— "; color: var(--colorAcento); }
+
+      /* ---------- Vertical: todo apilado ---------- */
+      [data-formato="vertical"] .logo { width: 300px; height: 64px; }
+      [data-formato="vertical"] .folio { font-size: 19px; max-width: 420px; }
+      [data-formato="vertical"] .pie { flex-direction: column; align-items: flex-start; gap: 18px; }
+      [data-formato="vertical"] #p-pregunta .titulo { font-size: 150px; }
+      [data-formato="vertical"] #p-pregunta .lomo { display: none; }
+      [data-formato="vertical"] #p-beneficio .cuerpo,
+      [data-formato="vertical"] #p-numero .cuerpo { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+      [data-formato="vertical"] .foto { justify-self: center; }
+      [data-formato="vertical"] .pie-foto { max-width: none; }
+      [data-formato="vertical"] #p-beneficio .titulo { font-size: 104px; }
+      [data-formato="vertical"] #p-numero .valor { font-size: 300px; }
+      [data-formato="vertical"] #p-numero .sub { font-size: 50px; }
+      [data-formato="vertical"] #p-lista .cuerpo { grid-template-columns: 1fr; }
+      [data-formato="vertical"] #p-lista .titulo { font-size: 120px; margin-bottom: 56px; }
+      [data-formato="vertical"] #p-lista li { font-size: 66px; padding: 28px 0; grid-template-columns: 100px 1fr; }
+      [data-formato="vertical"] #p-lista .foto { display: none; }
+      [data-formato="vertical"] #p-antes .antes ul { font-size: 46px; }
+      [data-formato="vertical"] #p-antes .despues ul { font-size: 76px; }
+      [data-formato="vertical"] #p-antes .col { gap: 40px; }
+      [data-formato="vertical"] #p-antes .cuerpo { grid-template-columns: 1fr; grid-template-rows: 1fr auto 1fr; }
+      [data-formato="vertical"] #p-antes .col { padding: 0; }
+      [data-formato="vertical"] #p-antes .divisor { width: auto; height: 1.5px; margin: 40px 0; }
+
+      /* ---------- 4:5: como horizontal, más compacto ---------- */
+      [data-formato="4x5"] .logo { width: 260px; height: 52px; }
+      [data-formato="4x5"] .folio, [data-formato="4x5"] .versalita { font-size: 17px; }
+      [data-formato="4x5"] .cuerpo { padding: 40px 0; }
+      [data-formato="4x5"] .sub { font-size: 27px; }
+      [data-formato="4x5"] .regla { margin: 26px 0 22px; }
+      [data-formato="4x5"] .cta { height: 66px; padding: 0 28px; font-size: 25px; }
+      [data-formato="4x5"] .insignia, [data-formato="4x5"] .insignia-web { height: 54px; }
+      [data-formato="4x5"] .insignia-web b { font-size: 22px; }
+      [data-formato="4x5"] .url { font-size: 17px; }
+      [data-formato="4x5"] .pie { padding-top: 22px; }
+      [data-formato="4x5"] .pie-foto { font-size: 17px; max-width: 340px; }
+      [data-formato="4x5"] .marco { padding: 10px; }
+      [data-formato="4x5"] #p-pregunta .titulo { font-size: 128px; }
+      [data-formato="4x5"] #p-pregunta .lomo { display: none; }
+      [data-formato="4x5"] #p-beneficio .titulo { font-size: 74px; margin-top: 20px; }
+      [data-formato="4x5"] #p-numero .valor { font-size: 230px; }
+      [data-formato="4x5"] #p-numero .sub { font-size: 38px; }
+      [data-formato="4x5"] #p-lista .titulo { font-size: 70px; margin-bottom: 26px; }
+      [data-formato="4x5"] #p-lista li { font-size: 38px; grid-template-columns: 62px 1fr; padding: 14px 0; }
+      [data-formato="4x5"] #p-lista li i { font-size: 30px; }
+      [data-formato="4x5"] #p-antes .cuerpo { grid-template-columns: 1fr; grid-template-rows: 1fr auto 1fr; }
+      [data-formato="4x5"] #p-antes .col { padding: 0; gap: 22px; }
+      [data-formato="4x5"] #p-antes .divisor { width: auto; height: 1.5px; margin: 26px 0; }
+      [data-formato="4x5"] #p-antes .divisor span { width: 76px; height: 76px; font-size: 46px; transform: translate(-50%, -50%) rotate(90deg); }
+      [data-formato="4x5"] #p-antes .antes ul { font-size: 34px; }
+      [data-formato="4x5"] #p-antes .despues ul { font-size: 60px; }
+      [data-formato="vertical"] #p-antes .divisor span { transform: translate(-50%, -50%) rotate(90deg); }
+    </style>
+  </head>
+  <body>
+    <!-- Cada pieza ocupa 1 s de la línea de tiempo; el script saca una imagen de cada una -->
+    <div id="root" data-formato="horizontal" data-composition-id="main" data-start="0" data-duration="5" data-width="1920" data-height="1080">
+      <section id="p-pregunta" class="clip pieza" data-start="0" data-duration="1" data-track-index="0">
+        <header class="cab"><img class="logo" src="{{img:logoClaro}}" alt="" /><span class="folio" data-folio="01"></span></header>
+        <div class="cuerpo">
+          <div class="texto">
+            <h1 class="titulo" id="preguntaTitulo" data-ajustar data-caja=".texto"></h1>
+            <span class="regla"></span>
+            <p class="sub" id="preguntaSub"></p>
+          </div>
+        </div>
+        <footer class="pie" data-pie></footer>
+        <span class="lomo versalita" id="preguntaLomo"></span>
+      </section>
+
+      <section id="p-beneficio" class="clip pieza" data-start="1" data-duration="1" data-track-index="0">
+        <header class="cab"><img class="logo" src="{{img:logoClaro}}" alt="" /><span class="folio" data-folio="02"></span></header>
+        <div class="cuerpo">
+          <div class="texto">
+            <span class="versalita" id="beneficioKicker"></span>
+            <h1 class="titulo" id="beneficioTitulo" data-ajustar data-caja=".texto"></h1>
+            <span class="regla"></span>
+            <p class="sub" id="beneficioSub"></p>
+          </div>
+          <figure class="foto">
+            <div class="marco"><img src="{{img:@beneficio}}" alt="" /></div>
+            <figcaption class="pie-foto" id="beneficioPieFoto"></figcaption>
+          </figure>
+        </div>
+        <footer class="pie" data-pie></footer>
+      </section>
+
+      <section id="p-numero" class="clip pieza tinta" data-start="2" data-duration="1" data-track-index="0">
+        <header class="cab"><img class="logo" src="{{img:logo}}" alt="" /><span class="folio" data-folio="03"></span></header>
+        <div class="cuerpo">
+          <div class="texto">
+            <span class="versalita" id="numeroEtiqueta"></span>
+            <span class="valor" id="numeroValor" data-ajustar data-caja=".texto"></span>
+            <p class="sub" id="numeroSub"></p>
+          </div>
+          <figure class="foto">
+            <div class="marco"><img src="{{img:@numero}}" alt="" /></div>
+          </figure>
+        </div>
+        <footer class="pie" data-pie></footer>
+      </section>
+
+      <section id="p-lista" class="clip pieza" data-start="3" data-duration="1" data-track-index="0">
+        <header class="cab"><img class="logo" src="{{img:logoClaro}}" alt="" /><span class="folio" data-folio="04"></span></header>
+        <div class="cuerpo">
+          <div class="texto">
+            <h1 class="titulo" id="listaTitulo" data-ajustar data-caja=".texto"></h1>
+            <ol id="listaItems"></ol>
+          </div>
+          <figure class="foto">
+            <div class="marco"><img src="{{img:@lista}}" alt="" /></div>
+          </figure>
+        </div>
+        <footer class="pie" data-pie></footer>
+      </section>
+
+      <section id="p-antes" class="clip pieza" data-start="4" data-duration="1" data-track-index="0">
+        <header class="cab"><img class="logo" src="{{img:logoClaro}}" alt="" /><span class="folio" data-folio="05"></span></header>
+        <div class="cuerpo">
+          <div class="col antes"><span class="versalita" id="antesTitulo"></span><ul id="antesItems"></ul></div>
+          <div class="divisor"><span>→</span></div>
+          <div class="col despues"><span class="versalita" id="despuesTitulo"></span><ul id="despuesItems" data-ajustar data-caja=".col"></ul></div>
+        </div>
+        <footer class="pie" data-pie></footer>
+      </section>
+    </div>
+
+    <script>
+      // El script anunciar.mjs reemplaza este objeto con los datos de la marca
+      const D = "__DATOS__";
+      armarPiezas(() => {
+        const T = D.textos;
+        const I = D.imagenes;
+        const romanos = ["i.", "ii.", "iii.", "iv.", "v."];
+        document.querySelectorAll("[data-folio]").forEach((el) => (el.textContent = `N.º ${el.dataset.folio}${T.kicker ? " · " + T.kicker : ""}`));
+
+        $("preguntaTitulo").innerHTML = resaltar(I.pregunta.titulo, I.pregunta.resaltado);
+        $("preguntaSub").textContent = I.pregunta.subtitulo;
+        $("preguntaLomo").textContent = T.url || T.nombre;
+
+        const b = I.beneficio;
+        $("beneficioKicker").textContent = b.kicker;
+        $("beneficioTitulo").textContent = b.titulo;
+        $("beneficioSub").textContent = b.subtitulo;
+        $("beneficioPieFoto").innerHTML = b.tarjeta ? `<b>${esc(b.tarjeta.etiqueta)}</b>${esc(b.tarjeta.valor)}` : "";
+
+        $("numeroEtiqueta").textContent = I.numero.etiqueta;
+        $("numeroValor").textContent = I.numero.valor;
+        $("numeroSub").textContent = I.numero.subtitulo;
+
+        $("listaTitulo").textContent = I.lista.titulo;
+        $("listaItems").innerHTML = I.lista.items.map((t, i) => `<li><i>${romanos[i]}</i><span>${esc(t)}</span></li>`).join("");
+
+        const a = I["antes-despues"];
+        $("antesTitulo").textContent = a.antesTitulo;
+        $("despuesTitulo").textContent = a.despuesTitulo;
+        $("antesItems").innerHTML = a.antes.map((t) => `<li>${esc(t)}</li>`).join("");
+        $("despuesItems").innerHTML = a.despues.map((t) => `<li>${esc(t)}</li>`).join("");
+      }).then(() => {
+        window.__timelines["main"] = gsap.timeline({ paused: true });
+      });
+    </script>
+  </body>
+</html>

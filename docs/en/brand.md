@@ -31,10 +31,12 @@ See the [Spanish page](../es/marca.md#ejemplo-completo) for a complete `marca.js
 |---|---|
 | `origen` | Path of the analyzed project. The skill uses it to recognize the brand next time. |
 | `idioma` | Language of the ads (`es`, `en`…). |
-| `estilos` | Default visual style for `imagenes` (images) and `video`: `oscuro` (dark), `claro` (light), `color` or `minimal`. |
+| `direccion` | Creative direction for images: `editorial`, `poster`, `datos`, `nocturno`, `cercano` or `clasica` (default). See [directions.md](directions.md). |
+| `estilos` | Color style of the classic direction, for `imagenes` (images) and `video`: `oscuro` (dark), `claro` (light), `color` or `minimal`. |
 | `reglas` | Rules the copy and voice must always follow (banned phrases, tone, claims that can't be made). |
-| `plantilla` | Video template (default `app-promo`). |
-| `plantillaImagenes` | Image template (default `piezas`). |
+| `plantilla` | Video template (default `promo`). |
+| `video` | Optional. `gancho`: the video's hook type, `golpe` (slam), `demo` (the camera starts glued to the app) or `chat` (chat bubble); if missing, it's picked from the direction and the hook formula. `foco`: which part of each screen the camera zooms into on each benefit, from 0 (top) to 1 (bottom), for example `[0.25, 0.5, 0.3]`. |
+| `plantillaImagenes` | Your own copy of the classic image template (for example, with a bigger logo). Only used with the `clasica` direction. |
 
 ### `archivos` (files) and `fuentes` (fonts)
 
@@ -99,8 +101,21 @@ Each piece has its own copy, separate from the video.
 
 Defaults for `vozId`, `modelo` and `idioma` come from the repo's `config.local.json → voz`, falling back to `config.json → voz`.
 
+### `ganchos` (hooks)
+
+Hook variants, to test which one keeps people watching (see [hooks.md](hooks.md)). The default hook is the one in `textos.hookLinea1/2`, `voz.guion.gancho` and `imagenes.pregunta`; with `--gancho N`, hook number N from this list is used instead.
+
+| Field | Meaning |
+|---|---|
+| `formula` | Formula name from [hooks.md](hooks.md#formulas). |
+| `pantalla` | The two on-screen hook lines (≤ 22 chars each; the second is highlighted). |
+| `voz` | The spoken line. Its audio goes in `voz/gancho-N.mp3`. |
+| `imagen` | Optional: `titulo`, `resaltado` and `subtitulo` for the "question" piece. If missing, the title is the two `pantalla` lines. |
+| `puntaje` | The score from `node anunciar.mjs ganchos`. |
+
 ## Copy rules
 
+- Hooks follow [hooks.md](hooks.md): no preamble, the hook word in the first 3 words, and a concrete situation.
 - No made-up claims: no user counts, improvement percentages or awards. Sample amounts and data shown inside the UI are fine.
 - Concrete benefits rather than features ("Know what you earn", not "Reports module").
 - Follow the brand's `reglas`.
